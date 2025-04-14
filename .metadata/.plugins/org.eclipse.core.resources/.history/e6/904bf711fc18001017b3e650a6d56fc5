@@ -1,0 +1,44 @@
+package days01;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class Ex03 {
+	public static void main(String[] args) {
+		// [ scott.dept select -> 화면 출력 ]
+		// 1. class.forName() JDBC 드라이버 로딩
+		// 2. Connection 객체 생성 DriverManager.getConnection()
+		// 3. CRUD
+		// 4. Connetion 객체 닫기 (close)
+
+		String className = "oracle.jdbc.driver.OracleDriver";
+		
+		String url = "jdbc:oracle:thin:@localhost:1521:xe";
+		String user = "scott";
+		String password = "tiger";
+		
+		
+		Connection conn = null; // finally에서 close 하기 위해 
+		try {
+			Class.forName(className);
+			conn = DriverManager.getConnection(url, user, password);
+			// 3. CRUD
+			System.out.println(conn.isClosed());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				conn.close();
+				System.out.println(conn.isClosed());
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			
+		}
+
+	}
+
+}

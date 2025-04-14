@@ -1,0 +1,80 @@
+package days01;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class Ex03_02 {
+	public static void main(String[] args) {
+		// [ scott.dept select -> 화면 출력 ]
+		// 1. class.forName() JDBC 드라이버 로딩
+		// 2. Connection 객체 생성 DriverManager.getConnection()
+		// 3. CRUD
+		//    -> 명령 수행 객체 만들어야
+		// 		Statement
+		// 4. Connetion 객체 닫기 (close)
+
+		String className = "oracle.jdbc.driver.OracleDriver";
+		
+		String url = "jdbc:oracle:thin:@localhost:1521:xe";
+		String user = "scott";
+		String password = "tiger";
+		
+		String sql = "SELECT *"
+					+ " FROM dept";
+		
+		Connection conn = null; // finally에서 close 하기 위해 
+		//java.sql
+		Statement stmt = null;
+		ResultSet rs = null; // select 결과물 담는 객체
+		
+		int deptno ;
+		String dname, loc;
+		
+		try {
+			Class.forName(className);
+			conn = DriverManager.getConnection(url, user, password);
+			// 3. CRUD
+			//System.out.println(conn.isClosed()); // false
+			// interface new로 생성 x
+			stmt = conn.createStatement();
+			//stmt.executeUpdate(sql); insert, update, delete DML 문 사용 시
+			rs = stmt.executeQuery(sql); // select DQL문 사용
+			/*
+//			rs.next(); // O -> true
+			while (rs.next()) {
+				deptno = rs.getInt("deptno");
+				dname = rs.getString("dname");
+				loc = rs.getString("loc");
+				System.out.printf("%d\t%s\t%s\n", deptno, dname, loc);
+			}
+			*/
+			
+			while (rs.next()) {
+				deptno = rs.getInt(1);
+				dname = rs.getString(2);
+				loc = rs.getString(3);
+				System.out.printf("%d\t%s\t%s\n", deptno, dname, loc);
+			}
+			
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				rs.close(); // 꼭, 이 위치에 
+				stmt.close(); // 일꾼도 close 하는게 좋음. 
+				conn.close();
+				//System.out.println(conn.isClosed()); // true
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			
+		}
+
+	} // main
+
+} // class
