@@ -1,0 +1,18 @@
+package days02;
+
+/**
+ * @author msg
+ * @date 2025. 4. 15. -오전 11:24:18
+ * @Subject
+ * @Content 1. 부서 정보 출력
+ * 			2. 부서를 선택하세요 ? 10 엔터
+ * 			3. 해당 부서의 사원들 정보를 출력
+ */
+public class Ex05 {
+
+	public static void main(String[] args) {
+		
+
+	}
+
+}

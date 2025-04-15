@@ -1,0 +1,14 @@
+package org.doit.domain;
+
+
+import java.time.LocalDateTime;
+
+public class EmpVO {// ArrayList<EmpVO>  출력.. / EmpDTO와 나중엔 구분안하고 사용
+	
+	private int empno, mgr, deptno ;
+	private String ename, job;
+	private double sal, comm;
+	private LocalDateTime hiredate;
+	
+	
+}

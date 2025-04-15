@@ -1,0 +1,129 @@
+package days02;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.util.Scanner;
+
+import com.util.DBConn;
+
+/**
+ * @author msg
+ * @date 2025. 4. 15. -오후 3:21:49
+ * @Subject SELECT, INSERT, UPDATE, DELETE
+ * @Content CRUD 작업
+ * 			DEPT 테이블 사용
+ */
+public class Ex08 {
+
+	public static String [] menu = { "추가", "수정", "삭제", "조회", "검색", "종료" };
+	public static int selectedNumber ; // 선택한 메뉴를 저장할 변수
+	public static Connection conn;
+	public static Scanner scanner = new Scanner(System.in);
+	public static Statement stmt = null;
+	
+	public static void main(String[] args) {
+		
+		conn = DBConn.getConnection();
+		
+		do {
+			메뉴출력();
+			메뉴선택();
+			메뉴처리();			
+		} while (true);
+		
+		
+	} // main
+
+	private static void 메뉴처리() {
+//		[ enum 열거형 선언 후 열거형을 사용하는 코딩으로 수정 ]
+		switch (selectedNumber) {
+		case 1: //ADD
+			부서추가();
+			break;
+		case 2:
+			부서수정();
+			break;
+			
+		case 3:
+			부서삭제();
+			break;
+			
+		case 4:
+			부서조회();
+			break;
+			
+		case 5:
+			부서검색();
+			break;
+		
+		case 6:
+			종료();
+			break;
+		
+			
+			일시정지();
+	}
+	}
+
+		private static void 일시정지() {
+		      System.out.print("엔터치면 계속합니다.");
+		      try {
+		         System.in.read();
+		         System.in.skip( System.in.available() );
+		      } catch (IOException e) { 
+		         e.printStackTrace();
+		      }      
+		   }
+
+	private static void 종료() {
+		
+		DBConn.close();
+		scanner.close();
+		System.out.println("프로그램 종료!!!");
+		System.exit(-1);
+		
+	}
+
+	private static void 부서검색() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private static void 부서조회() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private static void 부서삭제() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private static void 부서수정() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private static void 부서추가() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private static void 메뉴선택() {
+	      try{
+	         System.out.print("> 메뉴 선택하세요 ? ");
+	         selectedNumber = scanner.nextInt();
+	         scanner.nextLine(); // \r\n 제거 작업
+	      } catch (Exception e) {      }      
+	   }
+
+	private static void 메뉴출력() {
+		System.out.printf("[메뉴]\n");
+		for (int i = 0; i < menu.length; i++) {
+			System.out.printf("%d. %s\n", i+1, menu[i]);
+		} // for
+		
+	}
+
+} // class

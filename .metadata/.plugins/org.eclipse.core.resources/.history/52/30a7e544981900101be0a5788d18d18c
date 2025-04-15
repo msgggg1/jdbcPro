@@ -1,0 +1,38 @@
+package org.doit.domain;
+
+
+import java.time.LocalDateTime;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
+
+@Getter // 모든 필드에 getter 생성
+@Setter // 모든 필드에 setter 생성
+@NoArgsConstructor // default 생성자
+@AllArgsConstructor // 모든 필드를 매개변수로 가지는 생성자
+@ToString // toString() 생성 --> 비밀번호도 출력
+// @ToString(exclude = "mgr") 제외시키고 출력
+//@EqualsAndHashCode // equals(), hashCode() 생성
+//@RequiredArgsConstructor // final 필드 + @Nonnull 필드만 가지는 생성자
+//@Data // getter, setter, toString, EqualsAndHashCode , ..  안쓰는게 좋다. 나중에 문제생김
+// -> 주의) equals()/hashCode() 충돌, 보안 문제 발생
+//@Slf4j == private static final Logger log 로그기록 객체 생성
+@Builder
+// 유지보수 쉽고, 간결
+public class EmpVO {// ArrayList<EmpVO>  출력.. / EmpDTO와 나중엔 구분안하고 사용
+	
+	private int empno, mgr, deptno ;
+	private String ename, job;
+	private double sal, comm;
+	private LocalDateTime hiredate;
+	
+	
+}

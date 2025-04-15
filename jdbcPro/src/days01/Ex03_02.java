@@ -25,7 +25,7 @@ import oracle.jdbc.driver.OracleDriver;
 public class Ex03_02 {
 	public static void main(String[] args) {
 		
-String className = "oracle.jdbc.driver.OracleDriver";
+		String className = "oracle.jdbc.driver.OracleDriver";
 		
 		String url = "jdbc:oracle:thin:@localhost:1521:xe";
 		String user = "scott";

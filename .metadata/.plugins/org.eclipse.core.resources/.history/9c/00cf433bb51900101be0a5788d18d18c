@@ -1,0 +1,72 @@
+package days02;
+
+import java.beans.Statement;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+
+import org.doit.domain.EmpDeptSalgradeVO;
+import org.doit.domain.EmpVO;
+
+import com.util.DBConn;
+
+/**
+ * @author msg
+ * @date 2025. 4. 15. -오후 12:22:30
+ * @Subject
+ * @Content
+ */
+public class Ex07 {
+
+	public static void main(String[] args) {
+		/*
+[실행결과]
+1등급   (     700~1200 ) - 2명                        key
+      20   RESEARCH   7369   SMITH   800               value
+      30   SALES         7900   JAMES   950
+2등급   (   1201~1400 ) - 2명
+   30   SALES   7654   MARTIN   2650
+   30   SALES   7521   WARD      1750   
+3등급   (   1401~2000 ) - 2명
+   30   SALES   7499   ALLEN      1900
+   30   SALES   7844   TURNER   1500
+4등급   (   2001~3000 ) - 4명
+    10   ACCOUNTING   7782   CLARK   2450
+   20   RESEARCH   7902   FORD   3000
+   20   RESEARCH   7566   JONES   2975
+   30   SALES   7698   BLAKE   2850
+5등급   (   3001~9999 ) - 1명   
+   10   ACCOUNTING   7839   KING   5000
+		 */   
+		
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		
+		String sql = "select empno, ename, dname, sal+NVL(comm,0) pay, grade, losal, hisal, job, deptno"
+				+ " from emp e left join dept d on e.deptno = d.deptno"
+				+ "            join salgrade s ON e.sal BETWEEN s.losal AND s.hisal";
+		
+		conn = DBConn.getConnection();
+		
+		int grade;
+		int losal, hisal;
+		int cnt;
+		
+		int deptno;
+		String job;
+		int empno;
+		String ename;
+		double pay;
+		String dname;
+		
+		
+		
+		EmpDeptSalgradeVO.builder().grade(grade).losal(losal).hisal(hisal).deptno(deptno).ename(ename).pay(pay).dname(dname);
+		
+		
+		
+
+	} // main
+
+} //class

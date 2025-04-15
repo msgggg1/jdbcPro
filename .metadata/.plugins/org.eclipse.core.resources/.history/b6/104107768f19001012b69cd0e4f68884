@@ -1,0 +1,15 @@
+package days02;
+
+/**
+ * @author msg
+ *
+ */
+public class Ex01 {
+
+	public static void main(String[] args) {
+		// 1,2,4 반복적 -> class library
+		// com.util.DBConn.java : Connection
+
+	} // main
+
+} // class

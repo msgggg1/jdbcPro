@@ -1,0 +1,82 @@
+package org.doit.domain;
+
+import java.time.LocalDate;
+
+public class EmpVO {// ArrayList<EmpVO>  출력..
+	private int empno, mgr, deptno ;
+	private String ename, job;
+	private double sal, comm;
+	private LocalDate hiredate;
+	
+	public EmpVO(int empno, int mgr, int deptno, String ename, String job, double sal, double comm,
+			LocalDate hiredate) {
+		super();
+		this.empno = empno;
+		this.mgr = mgr;
+		this.deptno = deptno;
+		this.ename = ename;
+		this.job = job;
+		this.sal = sal;
+		this.comm = comm;
+		this.hiredate = hiredate;
+	}
+	public EmpVO() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	public int getEmpno() {
+		return empno;
+	}
+	public void setEmpno(int empno) {
+		this.empno = empno;
+	}
+	public int getMgr() {
+		return mgr;
+	}
+	public void setMgr(int mgr) {
+		this.mgr = mgr;
+	}
+	public int getDeptno() {
+		return deptno;
+	}
+	public void setDeptno(int deptno) {
+		this.deptno = deptno;
+	}
+	public String getEname() {
+		return ename;
+	}
+	public void setEname(String ename) {
+		this.ename = ename;
+	}
+	public String getJob() {
+		return job;
+	}
+	public void setJob(String job) {
+		this.job = job;
+	}
+	public double getSal() {
+		return sal;
+	}
+	public void setSal(double sal) {
+		this.sal = sal;
+	}
+	public double getComm() {
+		return comm;
+	}
+	public void setComm(double comm) {
+		this.comm = comm;
+	}
+	public LocalDate getHiredate() {
+		return hiredate;
+	}
+	public void setHiredate(LocalDate hiredate) {
+		this.hiredate = hiredate;
+	}
+	@Override
+	public String toString() {
+		return "EmpVO [empno=" + empno + ", mgr=" + mgr + ", deptno=" + deptno + ", ename=" + ename + ", job=" + job
+				+ ", sal=" + sal + ", comm=" + comm + ", hiredate=" + hiredate + "]";
+	}
+	
+	
+}

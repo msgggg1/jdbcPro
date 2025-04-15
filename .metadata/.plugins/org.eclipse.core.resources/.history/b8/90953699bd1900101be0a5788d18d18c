@@ -1,0 +1,202 @@
+package days02;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import org.doit.domain.EmpDeptSalgradeVO;
+import org.doit.domain.EmpVO;
+import org.doit.domain.SalgradeVO;
+
+import com.util.DBConn;
+
+/**
+ * @author msg
+ * @date 2025. 4. 15. -오후 12:22:30
+ * @Subject
+ * @Content
+ */
+public class Ex07_02 {
+	/*
+	[실행결과]
+	1등급   (     700~1200 ) - 2명                        
+	2등급   (   1201~1400 ) - 2명
+	3등급   (   1401~2000 ) - 2명
+	4등급   (   2001~3000 ) - 4명
+	5등급   (   3001~9999 ) - 1명   
+			 */   
+	public static void main(String[] args) {
+		// SalgradeVO.java
+		String sql = "select grade, losal, hisal, count(*) cnt"
+				+ " From salgrade s join emp e on e.sal BETWEEN losal and hisal"
+				+ " group by grade, losal, hisal"
+				+ " Order by grade ASC ";
+		
+		String sql2 = "select d.deptno, d.dname, empno, ename, sal "
+					+ "from dept d right join emp e ON d.deptno = e.deptno "
+					+ "                    join salgrade s ON e.sal BETWEEN losal and hisal "
+					+ "where grade = "; // 나중에 deptno 연결
+		
+		ArrayList<SalgradeVO> list = null;
+		
+		Connection conn = null;
+		Statement stmt = null, stmt2 = null;
+		ResultSet rs = null, rs2 = null;
+		
+		int grade, losal, hisal, cnt;
+		int deptno, empno;
+		String dname, ename;
+		double sal;
+		
+		SalgradeVO vo = null;
+			
+	
+		try {
+			conn = DBConn.getConnection(); 
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(sql);
+			
+			if (rs.next()) {
+				list = new ArrayList<>();
+				do {
+					grade = rs.getInt("grade");
+					losal = rs.getInt("losal");
+					hisal = rs.getInt("hisal");
+					cnt  = rs.getInt("cnt");
+					vo = new SalgradeVO(grade, losal, hisal, cnt);
+					list.add(vo);
+					// 출력
+					System.out.printf("%d등급   ( %d ~ %d ) - %d명\n", grade, losal, hisal, cnt );
+					
+					String sql3 = sql2 + grade;// 계속 길어짐
+					stmt2 = conn.createStatement();
+					rs2 = stmt2.executeQuery(sql3);
+					
+					if (rs2.next()) {
+						
+						do {
+							
+							deptno = rs2.getInt("deptno");
+							dname = rs2.getString("dname");
+							empno = rs2.getInt("empno");
+							ename = rs2.getString("ename");
+							sal = rs2.getDouble("sal");
+							
+							System.out.printf("\t%d\t%s\t%d\t%s\t%.2f\n", deptno, dname, empno, ename, sal);
+						} while (rs2.next());
+						//d.deptno, d.dname, empno, ename, sal
+
+					} else System.out.println("\t 사원 존재 X");
+					
+					rs2.close();
+					stmt2.close();
+
+				} while (rs.next());				
+				
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			if (rs != null)
+				try {
+					rs.close();
+					if (stmt != null) stmt.close();
+						DBConn.close(); // 4
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}		
+	}
+}
+	
+	/*
+//	public static void main(String[] args) {
+//	
+
+//		
+//		Connection conn = null;
+//		Statement stmt = null;
+//		ResultSet rs = null;
+//		
+//		String sql = "select empno, ename, dname, sal+NVL(comm,0) pay, grade, losal, hisal, job, deptno"
+//				+ " from emp e left join dept d on e.deptno = d.deptno"
+//				+ "            join salgrade s ON e.sal BETWEEN s.losal AND s.hisal";
+//		
+//		String maxSql = "select max(grade)"
+//						+ "	from salgrade";
+//
+//		int grade;
+//		int losal, hisal;
+//		int cnt;
+//		
+//		int deptno;
+//		String job;
+//		int empno;
+//		String ename;
+//		double pay;
+//		String dname;
+//		
+//		conn = DBConn.getConnection();
+//		
+//		ArrayList<ArrayList<EmpDeptSalgradeVO>> llist = null;
+//		ArrayList<EmpDeptSalgradeVO> list = null;
+//		EmpDeptSalgradeVO vo = null;
+//		
+//		try {
+//			stmt = conn.createStatement();
+//			rs = stmt.executeQuery(sql);
+//
+//			if (rs.next()) {
+//				llist = new ArrayList();
+//			
+//					do {
+//						list = new ArrayList();
+//						
+//						grade = rs.getInt("grade");
+//						losal = rs.getInt("losal");
+//						hisal = rs.getInt("hisal");
+//						deptno = rs.getInt("deptno");
+//						empno = rs.getInt("empno");
+//						job = rs.getString("job");
+//						ename = rs.getString("ename");
+//						pay = rs.getDouble("pay");
+//						dname = rs.getString("dname");					
+//						
+//						EmpDeptSalgradeVO.builder().grade(grade).losal(losal).hisal(hisal).deptno(deptno)
+//						.ename(ename).pay(pay).dname(dname).job(job);
+//						
+//						for (int i = 0; i < llist.size(); i++) {
+//							if (llist.isEmpty() || llist.get(i).get(8)!= deptno) {
+//								
+//						} // for
+//							
+//						} // if
+//						list.add(vo);
+//					} while (rs.next());
+//					
+//				} // if
+//
+//		
+//			
+//			for (int i = 0; i < list.size(); i++) {
+//				System.out.printf("%d등급   ( %d ~ %d ) - %d명 ", list.get(i).getGrade(), list.get(i).getLosal()
+//																,list.get(i).getHisal(), list.get(i));
+//				
+//			} // for
+//
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		
+//		
+//
+//	} // main
+//*/
+
+//} //class

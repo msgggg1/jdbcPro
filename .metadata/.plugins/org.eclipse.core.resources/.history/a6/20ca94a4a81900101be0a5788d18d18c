@@ -1,0 +1,10 @@
+package days02;
+
+public class Ex06 {
+
+	public static void main(String[] args) {
+		// empno, ename, hiredate, pay, dname, grade 출력 : 3개 테이블 조인 --대신--> VO 선언
+
+	} // main
+
+} // class

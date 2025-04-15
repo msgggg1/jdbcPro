@@ -1,0 +1,85 @@
+package org.doit.domain;
+
+
+import java.time.LocalDateTime;
+
+public class EmpVO2 {// ArrayList<EmpVO>  출력.. / EmpDTO와 나중엔 구분안하고 사용
+	
+	private int empno, mgr, deptno ;
+	private String ename, job;
+	private double sal, comm;
+	private LocalDateTime hiredate;
+	
+	public EmpVO2(int empno, int mgr, int deptno, String ename, String job, double sal, double comm,
+			LocalDateTime hiredate) {
+		super();
+		this.empno = empno;
+		this.mgr = mgr;
+		this.deptno = deptno;
+		this.ename = ename;
+		this.job = job;
+		this.sal = sal;
+		this.comm = comm;
+		this.hiredate = hiredate;
+	}
+	
+	public EmpVO2() {
+		super();
+	}
+	
+	public int getEmpno() {
+		return empno;
+	}
+	public void setEmpno(int empno) {
+		this.empno = empno;
+	}
+	public int getMgr() {
+		return mgr;
+	}
+	public void setMgr(int mgr) {
+		this.mgr = mgr;
+	}
+	public int getDeptno() {
+		return deptno;
+	}
+	public void setDeptno(int deptno) {
+		this.deptno = deptno;
+	}
+	public String getEname() {
+		return ename;
+	}
+	public void setEname(String ename) {
+		this.ename = ename;
+	}
+	public String getJob() {
+		return job;
+	}
+	public void setJob(String job) {
+		this.job = job;
+	}
+	public double getSal() {
+		return sal;
+	}
+	public void setSal(double sal) {
+		this.sal = sal;
+	}
+	public double getComm() {
+		return comm;
+	}
+	public void setComm(double comm) {
+		this.comm = comm;
+	}
+	public LocalDateTime getHiredate() {
+		return hiredate;
+	}
+	public void setHiredate(LocalDateTime hiredate) {
+		this.hiredate = hiredate;
+	}
+	@Override
+	public String toString() {
+		return "EmpVO [empno=" + empno + ", mgr=" + mgr + ", deptno=" + deptno + ", ename=" + ename + ", job=" + job
+				+ ", sal=" + sal + ", comm=" + comm + ", hiredate=" + hiredate + "]";
+	}
+	
+	
+}
