@@ -1,0 +1,42 @@
+package days03;
+
+/**
+ * @author msg
+ * @date 2025. 4. 16. -오후 2:07:25
+ * @Subject
+ * @Content [ JDBC 트랜잭션 처리 ]
+ * 			try{
+ * 				1) UPDATE ~ dept 테이블에 새로운 레코드 추가(INSERT)
+ * 				2) UPDATE   dept 테이블에 새로운 레코드 추가(INSERT)
+ * 				COMMIT;
+ * 			}catch(Exception e){
+ * 				ROLLBACK;
+ * 			}
+ * 
+ * 			Oracle PL/SQL 트랜잭션 처리
+ * 
+ * 			트랜잭션
+ * 				예) 계좌이체
+ * 					1) A 계좌 인출 : UPDATE
+ * 					2) B 계좌 입금 : UPDATE
+ * 
+ * 			C O R P 프로시저명
+ * 			()
+ * 			IS
+ * 			B
+ * 				1) UPDATE
+ * 				2) UPDATE
+ * 				COMMIT;
+ * 			EXCEPTION
+ * 				WHEN THEN
+ * 					ROLLBACK;
+ * 			E;
+ */
+public class Ex03 {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+	}
+
+}

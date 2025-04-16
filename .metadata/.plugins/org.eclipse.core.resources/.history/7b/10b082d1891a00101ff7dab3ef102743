@@ -1,0 +1,57 @@
+package days03;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import com.util.DBConn;
+
+/**
+ * @author msg
+ * @date 2025. 4. 16. -오후 2:29:41
+ * @Subject 자바 리플렉션(reflaction)
+ * @Content
+ * 		JDBC 리플렉션 ? 결과물 (rs)에 대한 정보를 추출해서 사용ㄷ하는 기술(DeptVO) 객체 매팅
+ */
+public class Ex04 {
+
+	public static void main(String[] args) {
+		
+		String sql = "SELECT table_name"
+				  + " FROM tabs";
+
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		String tableName = null;
+		
+		try {
+			conn = DBConn.getConnection();
+			pstmt = conn.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+			while (rs.next()) {
+				tableName = rs.getString("table_name");
+				System.out.println(tableName);
+			} // while
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null) rs.close();
+				if (pstmt != null) pstmt.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			DBConn.close();
+			
+		}
+		
+		
+		
+		System.out.println("end");
+	}
+
+}

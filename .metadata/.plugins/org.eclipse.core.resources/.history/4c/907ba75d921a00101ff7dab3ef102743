@@ -1,0 +1,133 @@
+package days03;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.Scanner;
+
+import com.util.DBConn;
+
+/**
+ * @author msg
+ * @date 2025. 4. 16. -오후 2:29:41
+ * @Subject 자바 리플렉션(reflaction)
+ * @Content
+ * 		JDBC 리플렉션 ? 결과물 (rs)에 대한 정보를 추출해서 사용ㄷ하는 기술(DeptVO) 객체 매팅
+ */
+public class Ex04 {
+
+	public static void main(String[] args) {
+		
+		String sql = "SELECT table_name"
+				  + " FROM tabs";
+
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		String tableName = null;
+		
+		try {
+			conn = DBConn.getConnection();
+			pstmt = conn.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+			while (rs.next()) {
+				tableName = rs.getString("table_name");
+				System.out.println(tableName);
+			} // while
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null) rs.close();
+				if (pstmt != null) pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			
+		}
+		
+		// 동적 쿼리 라고 생각
+		Scanner scanner = new Scanner(System.in);
+		System.out.print(">테이블 명 입력 ?");
+		tableName = scanner.next();
+		
+//		sql = "SELECT *"
+//				+ " FROM ? ";
+		sql = "SELECT * "
+				+"FROM " + tableName;
+		
+		try {
+			pstmt = conn.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+			
+//			while (rs.next()) {
+//				System.out.println(rs.getString(1));
+//			} 
+			// rs의 객체에 대한 정보( 칼럼수, 타입, 자료형 등)얻어올 수 있는 객체
+			ResultSetMetaData rsmd = rs.getMetaData();
+			int columnCount = rsmd.getColumnCount();
+			//System.out.println("컬럼 갯수 : " + columnCount);
+			// 각각 컬럼의 정보 조회
+			for (int i = 0; i < columnCount; i++) {
+				String columnName = rsmd.getColumnName(i+1);
+				String columnTypeName = rsmd.getColumnTypeName(i+1);
+				int columnType = rsmd.getColumnType(i+1);
+				int precision= rsmd.getPrecision(i+1);
+				
+				/*
+				if (숫자) {
+					정수
+					실수
+				} else if (문자열){
+					
+				} else if (날짜) {
+					
+				} // if
+				*/
+			
+				String scale = rsmd.getScale(i+1) == 0 ? "": String.valueOf(", "+rsmd.getScale(i+1)) ;
+				System.out.printf("%s\t%s(%d%s)\t%d    \n", 
+													columnName, columnTypeName, precision, scale, columnType );
+
+			} // for
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null) rs.close();
+				if (pstmt != null) pstmt.close();
+				DBConn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			
+		}
+		
+		System.out.println("end");
+	} //main
+
+	   public static <T> T mapResultSetToObject(ResultSet rs, Class<T> clazz) throws Exception {
+	       T obj = clazz.getDeclaredConstructor().newInstance();
+
+	       ResultSetMetaData metaData = rs.getMetaData();
+	       int columnCount = metaData.getColumnCount();
+
+	       for (int i = 1; i <= columnCount; i++) {
+	           String columnName = metaData.getColumnLabel(i); // 컬럼명
+	           Object value = rs.getObject(i);
+
+	           Field field = clazz.getDeclaredField(columnName);
+	           field.setAccessible(true);
+	           field.set(obj, value);
+	       }
+
+	       return obj;
+	   }
+
+	
+	
+} // class

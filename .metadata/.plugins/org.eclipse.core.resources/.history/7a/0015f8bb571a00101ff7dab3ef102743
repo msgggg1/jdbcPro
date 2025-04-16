@@ -1,0 +1,70 @@
+package days03;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Scanner;
+
+import com.util.DBConn;
+
+public class Ex01 {
+
+	public static void main(String[] args) {
+//		[문제] emp 테이블을 사용해서 
+//	       1. 부서명으로 검색    f
+//	       2. 사원명으로 검색    n
+//	       3. 사원번호로 검색    p 
+//	       4. 잡(job) 으로 검색  j
+//	       5. 입사일자로 검색    h
+//
+
+
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		
+		String sql = "select *"
+				+ " from emp e left Join dept d On e.deptno = d.deptno "
+				+ " where ";
+		
+		String condition = "";
+		String field = "";
+		String keyword = "";
+		
+		Scanner scanner = new Scanner(System.in);
+		condition = scanner.nextLine();
+		keyword = scanner.nextLine();
+		
+		if (condition == "f") {
+			sql += "dname LIKE ('%" + keyword + "')";
+		} else if (condition == "n"){
+			sql += "ename LIKE ('%" + keyword + "')";
+		} else if(condition == "p") {
+			sql += "empno LIKE ('%" + keyword + "')";
+		} else if (condition == "j") {
+			sql += "job LIKE ('%" + keyword + "')";
+		} else if (condition == "h") {
+			sql += "hiredate LIKE ('%" + keyword + "')";
+		} 
+		
+		try {
+			conn = DBConn.getConnection();
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(sql);
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				stmt.close();
+				rs.close();
+				DBConn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+	} // main
+
+} // class

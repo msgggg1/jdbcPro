@@ -1,7 +1,9 @@
 package days02;
 
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -123,6 +125,24 @@ public class Ex07_02 {
 				}
 		}		
 	} // main
+	
+	public static <T> T mapResultSetToObject(ResultSet rs, Class<T> clazz) throws Exception {
+	    T obj = clazz.getDeclaredConstructor().newInstance();
+
+	    ResultSetMetaData metaData = rs.getMetaData();
+	    int columnCount = metaData.getColumnCount();
+
+	    for (int i = 1; i <= columnCount; i++) {
+	        String columnName = metaData.getColumnLabel(i); // 컬럼명
+	        Object value = rs.getObject(i);
+
+	        Field field = clazz.getDeclaredField(columnName);
+	        field.setAccessible(true);
+	        field.set(obj, value);
+	    }
+
+	    return obj;
+	}
 
 	private static void dispInfo(LinkedHashMap<SalgradeVO, ArrayList<EmpDeptSalgradeVO>> map) {
 		Set<Entry<SalgradeVO, ArrayList<EmpDeptSalgradeVO>>>  set = map.entrySet();

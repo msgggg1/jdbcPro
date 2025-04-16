@@ -1,0 +1,171 @@
+package days02;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import org.doit.domain.EmpDeptSalgradeVO;
+import org.doit.domain.SalgradeVO;
+
+import com.util.DBConn;
+
+/**
+ * @author msg
+ * @date 2025. 4. 15. -오후 2:42:30
+ * @Subject
+ * @Content
+ */
+
+// disp~~
+// 다른 레이어 계층 List 전달 -> 출력 / 짜장면 전달 -> 츨력 계층에 결고ㅏ값 list 전달
+public class Ex07_02 {
+	/*
+	[실행결과]
+	1등급   (     700~1200 ) - 2명                        
+	2등급   (   1201~1400 ) - 2명
+	3등급   (   1401~2000 ) - 2명
+	4등급   (   2001~3000 ) - 4명
+	5등급   (   3001~9999 ) - 1명   
+	 */   
+	public static void main(String[] args) {
+		// SalgradeVO.java
+		String sql = "select grade, losal, hisal, count(*) cnt"
+				+ " From salgrade s join emp e on e.sal BETWEEN losal and hisal"
+				+ " group by grade, losal, hisal"
+				+ " Order by grade ASC ";
+
+		String sql2 = "select d.deptno, d.dname, empno, ename, sal "
+				+ "from dept d right join emp e ON d.deptno = e.deptno "
+				+ "                    join salgrade s ON e.sal BETWEEN losal and hisal "
+				+ "where grade = "; // 나중에 deptno 연결
+
+		ArrayList<SalgradeVO> list = null;
+
+		Connection conn = null;
+		Statement stmt = null, stmt2 = null;
+		ResultSet rs = null, rs2 = null;
+
+		int grade, losal, hisal, cnt;
+		int deptno, empno;
+		String dname, ename;
+		double sal;
+
+		SalgradeVO vo = null;
+		ArrayList<EmpDeptSalgradeVO> elist = null;
+		LinkedHashMap<SalgradeVO, ArrayList<EmpDeptSalgradeVO>> map = new LinkedHashMap<>();
+
+
+		try {
+			conn = DBConn.getConnection(); 
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(sql);
+
+			if (rs.next()) {
+				do {
+					grade = rs.getInt("grade");
+					losal = rs.getInt("losal");
+					hisal = rs.getInt("hisal");
+					cnt  = rs.getInt("cnt");
+					vo = new SalgradeVO(grade, losal, hisal, cnt);//key
+
+					String sql3 = sql2 + grade;// 계속 길어짐
+					stmt2 = conn.createStatement();
+					rs2 = stmt2.executeQuery(sql3);
+
+					if (rs2.next()) {
+						elist = new ArrayList<EmpDeptSalgradeVO>();
+						do {
+
+							deptno = rs2.getInt("deptno");
+							dname = rs2.getString("dname");
+							empno = rs2.getInt("empno");
+							ename = rs2.getString("ename");
+							sal = rs2.getDouble("sal");
+
+							EmpDeptSalgradeVO evo = new EmpDeptSalgradeVO(empno, ename, sal, null, dname, grade);
+							elist.add(evo);
+
+						} while (rs2.next());
+						//d.deptno, d.dname, empno, ename, sal
+
+					} else System.out.println("\t 사원 존재 X");
+
+					rs2.close();
+					stmt2.close();
+
+					map.put(vo, elist);
+
+				} while (rs.next());				
+
+			}
+
+			// Map 컬렉션 클래스
+			// key 		+ 	value 			=	entry 한쌍
+			// salgradeVO 	arrayList<empVO>
+			dispInfo(map);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			if (rs != null)
+				try {
+					rs.close();
+					if (stmt != null) stmt.close();
+					DBConn.close(); // 4
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+		}		
+	} // main
+
+	private static void dispInfo(LinkedHashMap<SalgradeVO, ArrayList<EmpDeptSalgradeVO>> map) {
+		Set<Entry<SalgradeVO, ArrayList<EmpDeptSalgradeVO>>>  set = map.entrySet();
+		Iterator<Entry<SalgradeVO, ArrayList<EmpDeptSalgradeVO>>> ir = set.iterator();
+
+		while (ir.hasNext()) {
+			Entry<SalgradeVO, ArrayList<EmpDeptSalgradeVO>> entry = ir.next();
+			SalgradeVO vo = entry.getKey();
+			System.out.printf("%d등급   ( %d ~ %d ) - %d명\n", vo.getGrade(), vo.getHisal()
+					,vo.getLosal(), vo.getCnt() );
+
+			ArrayList<EmpDeptSalgradeVO> elist = entry.getValue();
+			Iterator<EmpDeptSalgradeVO> ir2 = elist.iterator();
+
+			while (ir2.hasNext()) {
+				EmpDeptSalgradeVO v = ir2.next();
+				System.out.printf("\t%d\t%s\t%s\t%.2f\n", v.getEmpno(), v.getDname(),v.getEname(), v.getPay());
+
+			} // while
+			
+		} // while
+
+	}
+	
+	
+//	private static void dispInfo(LinkedHashMap<SalgradeVO, ArrayList<EmpDeptSalgradeVO>> map) {
+//	      			 //key value
+//	      map.forEach((vo, list) -> {
+//	          // 등급 정보 출력
+//	          System.out.printf("%d등급\t( %d~%d ) - %d명\n",
+//	                  vo.getGrade(), vo.getLosal(), vo.getHisal(), vo.getCnt());
+//
+//	          // 사원 리스트 출력
+//	          list.forEach(empvo -> System.out.printf(
+//	                  "\t\t%s\t%d\t%s\t%.2f\n",
+//	                  empvo.getDname(),
+//	                  empvo.getEmpno(),
+//	                  empvo.getEname(),
+//	                  empvo.getPay()));
+//	      });
+//	      
+//	   }
+}// class
+
+
+

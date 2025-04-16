@@ -1,0 +1,92 @@
+package days03;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import com.util.DBConn;
+
+/**
+ * @author msg
+ * @date 2025. 4. 16. -오후 2:07:25
+ * @Subject
+ * @Content [ JDBC 트랜잭션 처리 ]
+ * 			try{
+ * 				1) UPDATE ~ dept 테이블에 새로운 레코드 추가(INSERT)
+ * 				2) UPDATE   dept 테이블에 새로운 레코드 추가(INSERT)
+ * 				COMMIT;
+ * 			}catch(Exception e){
+ * 				ROLLBACK;
+ * 			}
+ * 
+ * 			Oracle PL/SQL 트랜잭션 처리
+ * 
+ * 			트랜잭션
+ * 				예) 계좌이체
+ * 					1) A 계좌 인출 : UPDATE
+ * 					2) B 계좌 입금 : UPDATE
+ * 
+ * 			C O R P 프로시저명
+ * 			()
+ * 			IS
+ * 			B
+ * 				1) UPDATE
+ * 				2) UPDATE
+ * 				COMMIT;
+ * 			EXCEPTION
+ * 				WHEN THEN
+ * 					ROLLBACK;
+ * 			E;
+ */
+public class Ex04 {
+
+	public static void main(String[] args) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		int rowcount = 0;
+		String sql = "INSERT INTO dept VALUES( ? , ? , ? )";
+		
+		// 자동 커밋 설정되어있음. -> 취소 
+		
+		try {
+			conn = DBConn.getConnection();
+			pstmt = conn.prepareStatement(sql);
+
+			// 자동 커밋 설정 취소
+			conn.setAutoCommit(false); // 기본 true
+			
+			// 1
+			pstmt.setInt(1, 70);
+			pstmt.setString(2, "부서3");
+			pstmt.setString(3, "지역3");
+			rowcount = pstmt.executeUpdate();
+			System.out.println(rowcount == 1 ? "INsert 1 성공":"insert 1 실패"); // 1
+			// 2
+			pstmt.setInt(1, 100);
+			pstmt.setString(2, "부서2");
+			pstmt.setString(3, "지역2");
+			rowcount = pstmt.executeUpdate();
+			System.out.println(rowcount == 1 ? "INsert 2 성공":"insert 2 실패"); 
+			
+			// 커밋
+			conn.commit();
+			
+		} catch (SQLException e) {
+			// 롤백
+			try {
+				conn.rollback();
+				// 70 안들어가있음
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+			e.printStackTrace();
+		} finally {
+			DBConn.close();			
+		}
+		
+		
+		System.out.println("end");
+		
+	} // main
+
+} // class

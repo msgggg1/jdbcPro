@@ -1,0 +1,448 @@
+package days03;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Scanner;
+
+import org.doit.domain.DeptVO;
+
+import com.util.DBConn;
+
+/**
+ * @author kEnik
+ * @date 2025. 4. 15. 오후 3:21:30
+ * @subject  SELECT, INSERT, UPDATE, DELETE
+ * @content  
+ *           enum 포함된 자바 파일 찾기   CMD   
+ *           findstr /S /M /C:"enum" *.java
+ *           
+ *           지금까지
+ *           Statement 인터페이스 사용. 앞으로 사용 안하는게 좋다
+ *           PreparedStatement 인터페이스 사용 -> mybatis (내부 처리시 preparedStatement 사용 d/t 성능)
+ *           앞으로 코딩 시 모두 preparedStatement           
+ *           
+ */
+public class Ex02_02 {
+
+	// 열거형 선언
+	public enum Menu {
+		ADD, UPDATE, DELETE, LIST, SEARCH, EXIT
+	}
+
+	public static String [] menu = { "추가", "수정", "삭제", "조회", "검색", "종료" };
+	public static int selectedNumber = 0;  // 선택한 메뉴를 저장할 변수.
+	public static Scanner scanner = new Scanner(System.in);
+
+	public static Connection conn = null;
+	public static ResultSet rs = null;	
+	public static Statement stmt = null;
+	public static PreparedStatement pstmt = null;
+	public static ArrayList<DeptVO> list = null;
+
+	public static void main(String[] args) {
+
+		conn = DBConn.getConnection();
+
+		do {
+			메뉴출력();
+			메뉴선택();
+			메뉴처리();   
+		} while (true);
+
+
+	} // main
+
+	private static void 메뉴처리() { 
+		// [ enum 열거형 선언 후 열거형을 사용하는 코딩으로 수정. ]
+
+		Menu selectedMenu = Menu.values()[selectedNumber - 1];
+
+		switch (selectedMenu) {
+		case ADD:
+			부서추가();
+			break;
+		case UPDATE:
+			부서수정();
+			break;
+		case DELETE:
+			부서삭제();
+			break;
+		case LIST:
+			부서조회();
+			break;
+		case SEARCH:
+			부서검색();
+			break;
+		case EXIT:
+			종료();
+			break;
+		}
+
+		일시정지();
+
+	}
+
+	private static void 일시정지() {
+		System.out.print("엔터치면 계속합니다.");
+		try {
+			System.in.read();
+			System.in.skip( System.in.available() );
+		} catch (IOException e) { 
+			e.printStackTrace();
+		}      
+	}
+
+	private static void 종료() {
+
+		DBConn.close();
+		scanner.close();
+		System.out.println("프로그램 종료!!!");
+		System.exit(-1);
+
+	}
+
+	private static void 부서조회() {
+		// 실행계획 -> 성능
+		String sql = "SELECT * "
+				+ "FROM dept "
+				+ "WHERE deptno > 0";
+		// 3 작업
+		int deptno;
+		String dname, loc;
+		DeptVO vo = null;
+		try {
+			//stmt = conn.createStatement();
+			pstmt = conn.prepareStatement(sql); // 미리 컴파일
+			rs = pstmt.executeQuery();
+			if (rs.next()) {
+				list = new ArrayList<DeptVO>();
+				do {
+					deptno = rs.getInt("deptno");
+					dname = rs.getString("dname");
+					loc = rs.getString("loc");               
+					vo = new DeptVO(deptno, dname, loc);
+					list.add(vo);
+				} while (rs.next());
+			} // if
+			부서출력();
+		} catch (SQLException e) { 
+			e.printStackTrace();
+		} finally { 
+			try {
+				if( rs != null )  rs.close();
+				if( pstmt != null ) pstmt.close();
+			} catch (SQLException e) { 
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	private static void 부서출력() {
+
+		/*
+      Iterator<DeptVO> ir = list.iterator();
+      System.out.println("-".repeat(30));
+      System.out.println("deptno\tdname\tloc\n");
+      System.out.println("-".repeat(30));
+      while (ir.hasNext()) {
+         DeptVO vo =  ir.next();
+         System.out.printf("%d\t%s\t%s\n"
+               , vo.getDeptno(), vo.getDname(), vo.getLoc());
+      } // 
+      System.out.println("-".repeat(30));
+		 */
+
+		// 람다식으로 변경
+		System.out.println("-".repeat(30));
+		System.out.printf("deptno\tdname\tloc\n");
+		System.out.println("-".repeat(30));
+		list.forEach(vo-> System.out.printf("%d\t%s\t%s\n"
+				, vo.getDeptno(), vo.getDname(), vo.getLoc()));
+		System.out.println("-".repeat(30));
+
+	}
+
+	private static void 부서검색() {
+		// 검색조건, 검색어 입력
+		String condition, keyWord ;
+		System.out.println("> 검색조건, 검색어 입력하세요 ?");
+		condition = scanner.nextLine();
+		keyWord = scanner.nextLine();
+
+		// 1. Class.forName() JDBC 드라이버 로딩 -- 처음에 가져옴 
+		// 2. Conn = DM.gc()
+		// 3. CRUD -- DB처리만 하면됨 -- 전역으로 stmt, rs 선언함
+		// 4. close() -- 프로그램 종료 시 
+
+
+		try {
+			String sql = "select *"
+					+ " from dept"
+					+ " where ";
+			// b(부서번호) / n(부서명) / l(지역명) / nl( 부서명 또는 지역명 )
+			if (condition.equalsIgnoreCase("b")) {
+				sql += "deptno = "+ keyWord;
+			} else if (condition.equalsIgnoreCase("n")) {
+				//			sql += "dname LIKE '%" + keyWord + "%' ";
+				//			sql += String.format("dname LIKE '%%%s%%'", keyWord); // %% -> %
+				sql += "regexp_LIKE(dname, '"+ keyWord +"' , 'i')";
+				sql += String.format("regexp_LIKE(dname, '%s' , 'i')", keyWord);
+			} else if (condition.equalsIgnoreCase("l")){
+				sql += String.format("regexp_LIKE(loc, '%s' , 'i')", keyWord);
+			} else if (condition.equalsIgnoreCase("nl")) {
+				sql += String.format("regexp_LIKE(dname, '%1$s' , 'i') OR "
+									+"regexp_LIKE(loc, '%1$s' , 'i')", keyWord);
+			} // if
+			System.out.println(sql);
+
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(sql);
+
+			int deptno;
+			String dname, loc;
+			DeptVO vo = null;
+
+
+			if (rs.next()) {
+				list = new ArrayList<DeptVO>();
+				do {
+					deptno = rs.getInt("deptno");
+					dname = rs.getString("dname");
+					loc = rs.getString("loc");               
+					vo = new DeptVO(deptno, dname, loc);
+					list.add(vo);
+				} while (rs.next());
+			} // if
+			부서출력();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (stmt != null) stmt.close();
+				if (stmt != null) rs.close();				
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	private static void 부서삭제() {
+		System.out.print("> 삭제할 부서번호 입력 ? "); 
+		String deptnos = scanner.nextLine(); // "10, 20, 30"
+		
+//		String regex = "\\s*,\\s*";
+//		String[] deptnoArr = deptnos.split(regex);
+//
+//		// ?, ?, ?, ... 형태로 만듦
+//		String placeholders = IntStream.range(0, deptnoArr.length)
+//		        .mapToObj(i -> "?")
+//		        .collect(Collectors.joining(", "));
+//
+//		String sql = "DELETE FROM dept WHERE deptno IN (" + placeholders + ")";
+
+		
+		String regex = "\\s*,\\s*";
+		String [] deptnoArr = deptnos.split(regex);
+
+		String sql = "DELETE FROM dept "
+				+ " WHERE deptno IN ( ";
+			
+		for (int i = 0; i < deptnoArr.length; i++) {
+			//stringbuider, buffer 사용
+			sql += "?, ";
+		} // for
+		
+		sql = sql.substring(0, sql.length()-2);
+		sql += " )";
+		
+		System.out.println(sql);
+
+		try {
+			pstmt = conn.prepareStatement(sql);
+			for (int i = 0; i < deptnoArr.length; i++) {
+//				pstmt.setInt(i+1, Interger.parseInt(deptnoArr[i])); //원칙은 Int
+				pstmt.setString(i+1, deptnoArr[i]); //원칙은 Int 그러나 상관없음
+			} // for
+			int rowCount = pstmt.executeUpdate(); // INSERT, UPDATE, DELETE (DML문)
+			
+			if ( rowCount >= 1) {
+				System.out.println(" 부서 삭제 성공!!!");
+			}
+		} catch (SQLException e) { 
+			e.printStackTrace();
+		} finally {
+			try {
+				if( pstmt != null ) pstmt.close();
+			} catch (SQLException e) { 
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	private static void 부서수정() {
+		//      50 QC2 null   부서명만 수정
+		//      50 null SEOUL 지역명만 수정
+		//      50 QC2 SEOUL  부서명, 지역명 수정
+
+		System.out.print("> 부서번호, 부서명, 지역명 입력: ");
+		int deptno = scanner.nextInt();
+		String dname = scanner.next();   // "null"
+		String loc = scanner.next();     // "null"
+
+		try { 
+			String sql = "UPDATE dept SET ";
+			pstmt = conn.prepareStatement(sql);
+
+			if (dname.equalsIgnoreCase("null")) {
+				sql +=  " loc = ? ";
+				pstmt.setString(1, loc);
+			} else if( loc.equalsIgnoreCase("null")) {
+				sql += " dname = ? ";
+				pstmt.setString(1, dname);
+			} else  {
+				sql += " dname = ?, loc = ? ";
+				pstmt.setString(1, loc);
+				pstmt.setString(2, dname);
+			}
+			
+			if (condition) {
+				
+			} else {
+				sql +=  " WHERE deptno = ? ";
+				pstmt.setInt(2, deptno);
+			} // else
+			
+			System.out.println( sql ); 
+
+			int rowCount = pstmt.executeUpdate();
+
+			if(rowCount == 1) {
+				System.out.println("부서 수정 성공");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+				try {
+					if(pstmt != null)
+					pstmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+		}
+
+	}
+
+	// 홍길동
+	private static void editDept() {
+		System.out.print("> 부서번호, 부서명, 지역명 입력: ");
+		int deptno = scanner.nextInt();
+		String dname = scanner.next();
+		String loc = scanner.next();
+
+		// 원래 부서명, 지역명 저장할 변수
+		String oDname = null;
+		String oLoc = null;
+
+
+		try {
+			String sql = "SELECT * FROM dept WHERE deptno="+deptno; 
+			stmt = conn.createStatement(); 
+			rs = stmt.executeQuery(sql);
+
+			if (rs.next()) {
+				oDname = rs.getString("dname");
+				oLoc = rs.getString("loc");
+			}
+
+			String sql2 = String.format("UPDATE dept "
+					+ "SET dname = '%s', loc = '%s' "
+					+ "WHERE deptno = %d"
+
+                  , dname.equals("null") ? oDname : dname
+                		  , loc.equals("null") ? oLoc : loc
+                				  , deptno);
+
+			int rowCount = stmt.executeUpdate(sql2);
+
+			if(rowCount == 1) {
+				System.out.println("부서 수정 성공");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if(stmt != null)
+				try {
+					stmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+		}
+
+	}
+
+	private static void 부서추가() {
+		System.out.print("> 부서번호, 부서명, 지역명 입력 ? ");
+		int deptno = scanner.nextInt(); // 시퀀스  
+		String dname = scanner.next();
+		String loc = scanner.next();
+
+		String sql = "INSERT INTO dept VALUES ( ?, ?, ? )"; // 쿼리 컴파일 -> 실행객체 / 바인딩 변수: 홑따옴표 필요없음
+		try {
+			pstmt = conn.prepareStatement(sql);
+			// ? ? ? IN 매개변수
+			 pstmt.setInt(1, deptno);  // 이걸 안 함!
+			 pstmt.setString(2, dname);
+			 pstmt.setString(3, loc);
+			 
+			int rowCount = pstmt.executeUpdate(); // INSERT, UPDATE, DELETE (DML문)
+			if ( rowCount == 1) {
+				System.out.println(" 부서 추가 성공!!!");
+			}
+		} catch (SQLException e) { 
+			e.printStackTrace();
+		} finally {
+			try {
+				if( pstmt != null ) pstmt.close();
+			} catch (SQLException e) { 
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	private static void 메뉴선택() {
+		try{
+			System.out.print("> 메뉴 선택하세요 ? ");
+			selectedNumber = scanner.nextInt();
+			scanner.nextLine(); // \r\n 제거 작업
+		} catch (Exception e) {      }      
+	}
+
+	private static void 메뉴출력() { 
+		System.out.printf("[메뉴]\n");
+		for (int i = 0; i < menu.length; i++) {
+			System.out.printf("%d. %s\n", i+1, menu[i]);
+		}
+	}
+
+} // class
+
+
+
+
+
+
+
+
+

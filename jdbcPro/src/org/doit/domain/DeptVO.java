@@ -7,6 +7,24 @@ public class DeptVO {
 	private String dname;
 	private String loc;
 	
+	private int cnt;
+	
+	public DeptVO(int deptno, String dname, String loc, int cnt) {
+		super();
+		this.deptno = deptno;
+		this.dname = dname;
+		this.loc = loc;
+		this.cnt = cnt;
+	}
+
+	public int getCnt() {
+		return cnt;
+	}
+
+	public void setCnt(int cnt) {
+		this.cnt = cnt;
+	}
+
 	public DeptVO() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -45,11 +63,9 @@ public class DeptVO {
 
 	@Override
 	public String toString() {
-		return "DeptVO [deptno=" + deptno + ", dname=" + dname + ", loc=" + loc + "]";
+		return "DeptVO [deptno=" + deptno + ", dname=" + dname + ", loc=" + loc + ", cnt=" + cnt + "]";
 	}
-	
-	
-	
+		
 	
 	
 }

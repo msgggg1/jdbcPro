@@ -107,7 +107,7 @@ public class Ex08 {
 		} else if (condition == "na" ) {
 			field = "dname";
 		} else if (condition == "nona") {
-			field = "deptno LIKE('%"+keyword%+"') OR dname LIKE('%"+keyword+""%')";
+			field = "deptno,name ";
 		} else if (condition == "l") {
 			field = "loc";
 		} else if (condition == "all") {
@@ -116,7 +116,7 @@ public class Ex08 {
 	      
 	      try {
 	    	  String sql = "SELECT "+ field +" FROM dept WHERE "
-	    			  			+" field LIKE('%" + keyword + "%')";
+	    			  			+ field + "LIKE('%" + keyword + "%')";
 	         
 	         stmt = conn.createStatement();
 	         rs = stmt.executeQuery(sql);
