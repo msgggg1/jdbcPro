@@ -1,0 +1,17 @@
+package days04.board.test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
+
+class BoardServiceTest {
+
+	
+	BoardService boardService ;
+	
+	@Test
+	void test() {
+		fail("Not yet implemented");
+	}
+
+}

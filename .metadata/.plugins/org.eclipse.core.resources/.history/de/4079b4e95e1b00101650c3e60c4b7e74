@@ -1,0 +1,33 @@
+package days04.board.controller;
+
+import java.util.Scanner;
+
+import days04.board.service.BoardService;
+
+public class BoardController {
+	
+	private BoardService boardService;
+	private Scanner scanner = null; // 객체 생성 시 생성
+	private int selectedNumber ;
+	// [ 페이징 처리 시 필요한 필드 선언 ]
+	
+	public BoardController() {
+		super();
+		this.scanner = new Scanner(System.in);
+	}
+
+	// 생성자 DI
+	public BoardController(BoardService boardService) {
+		this(); // 또 다른 생성자 호출 : scanner 객체 생성
+		this.boardService = boardService;
+	}
+	
+	// 게시판과 관련된 모든 기능 시작 함수
+	public void boardStart() {
+		
+		
+	}
+	
+	
+	
+} // class

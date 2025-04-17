@@ -50,7 +50,7 @@ public class Ex05 {
       int empno;
       String ename;
       LocalDateTime hiredate;
-      double  pay;
+      double pay;
       
       try {
          deptPstmt = conn.prepareStatement(deptSql);

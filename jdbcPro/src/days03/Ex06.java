@@ -45,7 +45,7 @@ public class Ex06 {
 			cstmt.setInt(1, id); // 파라미터 설정
 			cstmt.registerOutParameter(2,Types.INTEGER); // 등록 : INTEGER 값이다~
 			cstmt.execute(); // return boolean
-//			cstmt.executeQuery(); // return resultset -- 이걸로 처리할거아니ㅏㄹ서 아무거나 상관없음
+//			cstmt.executeQuery(); // return resultset -- 이걸로 처리할거아니라서 아무거나 상관없음
 			
 			int check  = cstmt.getInt(2); // out
 			

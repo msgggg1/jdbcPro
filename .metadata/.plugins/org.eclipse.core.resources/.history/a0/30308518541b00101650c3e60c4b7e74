@@ -1,0 +1,6 @@
+package days04.board.service;
+
+public class BoardService { // 사용자 요청 -> 컨트롤러 서비스 호출 -> 서비스가 Impl 호출
+	
+
+}

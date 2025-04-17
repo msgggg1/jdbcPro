@@ -82,7 +82,7 @@ BEGIN
     DBMS_OUTPUT.PUT_LINE(vcheck);
 END;
 
-
+----[나]
 create or replace procedure up_login
 (
     pid IN emp.empno%type
@@ -117,16 +117,197 @@ END;
 
 select *
 from emp;
+------
+
+create or replace procedure up_login
+(
+      pid IN emp.empno%type
+    , ppwd IN emp.ename%type
+    , pcheck out number -- 0(성공) 1(ID존재,pwdX), -1(ID존재X)
+)
+IS
+    vpwd emp.ename%type;
+BEGIN
+    SELECT count(*) INTO pcheck -- 1/0
+    FROM emp
+    where empno = pid;
+    
+    IF pcheck = 1 THEN -- ID 존재
+         SELECT ename INTO vpwd -- 1/0
+         FROM emp
+         where empno = pid;
+         
+         IF ppwd = vpwd THEN pcheck := 0;
+         -- ELSE X 이미 1
+         END IF;
+    ELSE --ID 존재X
+        pcheck := -1;
+    END IF;
+--EXCEPTION
+END;
+
+DECLARE
+    vcheck number;
+BEGIN
+    up_login(7369, 'SMITH', vcheck);
+    DBMS_OUTPUT.PUT_LINE(vcheck);
+END;
 
 
+---- 커서에 담아서 커서를 리턴
+create or replace procedure up_selectdept
+(
+    pdeptcursor OUT SYS_REFCURSOR
+)
+IS
+begin
+    OPEN pdeptcursor FOR
+    select *
+    from dept;
+--exception
+end;
 
 
+-- 
+create or replace procedure up_insertdept
+(
+    pdname dept.dname%type := null
+    , ploc dept.loc%type := null
+)
+IS
+    vdeptno dept.deptno%type;
+ 
+begin
+    select NVL(MAX(deptno),0) + 10 INTO vdeptno
+    FROm dept;
+    
+    INSERT INTO dept values(vdeptno, pdname, ploc);
+    commit;
+end;
 
+select *
+from dept;
+---
+create or replace procedure up_deletedept
+(
+    pdeptno dept.deptno%type 
+)
+IS 
+begin
+    
+    DELETE FROM dept 
+    where deptno = pdeptno;
+    commit;
+end;
+--[나]
 
+create or replace procedure up_updatedept
+(
+    pdeptno dept.deptno%type 
+    ,pdname IN OUT dept.dname%type
+    ,ploc IN OUT dept.loc%type
+)
+IS 
+    vdname dept.dname%type;
+    vloc dept.loc%type ;
+begin
+    select dname, loc INTO vdname, vloc
+    from dept
+    where deptno = pdeptno;
 
+    IF pdname IS NULL THEN pdname := vdname;
+    END IF;
+    IF ploc IS NULL THEN ploc := vloc;
+    END IF;
+    
+    UPDATE dept
+    SET dname = pdname, loc = ploc
+    WHERE deptno = pdeptno;
+end;
 
+---
+create or replace procedure up_updatedept
+(
+    pdeptno dept.deptno%type 
+    ,pdname dept.dname%type := null
+    ,ploc dept.loc%type := null
+)
+IS 
+    vdname dept.dname%type;
+    vloc dept.loc%type ;
+begin
+    UPDATE dept
+    SET dname = NVL(pdname, dname), loc = NVL(ploc, loc)
+    WHERE deptno = pdeptno;
+    commit;
+end;
 
+SELECT *
+from dept;
 
+----
+create sequence seq_tblcstVSBoard
+nocache;
 
+create table tbl_cstVSBoard (
+  seq NUMBER not null primary key,
+  writer varchar2 (20) not null ,
+  pwd varchar2 (20) not null ,
+  email varchar2 (100),
+  title varchar2 (200) not null ,
+  writedate date default sysdate,
+  readed number default 0,
+  tag number(1) not null , -- 0 or 1
+  content CLOB null
+);
 
+-- 더미 데이터 생성.
+BEGIN
+    For i IN 1..150 LOOP
+     INSERT into tbl_cstVSBoard 
+      ( seq,  writer, pwd, email, title, tag,  content)
+      values(seq_tblcstVSBoard.nextval, '홍길동' || MOD(i,10), '1234'
+                ,'홍길동' || MOD(i,10)||'@sist.co.kr'
+                , '더미'|| i
+                , 0
+                , '더미'|| i
+                );
+     END LOOP;
+END;
 
+select *
+from tbl_cstVSBoard;
+
+commit;
+
+--
+         BEGIN
+            UPDATE tbl_cstVSBoard
+            SET writer = '권태정'
+            WHERE MOD(seq, 15) = 4;
+            COMMIT;
+         END;
+         --
+          BEGIN
+             UPDATE tbl_cstVSBoard
+             SET title = '게시판 구현'
+             WHERE MOD(seq, 15) IN ( 3, 5, 8 );
+             COMMIT;
+          END;
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          

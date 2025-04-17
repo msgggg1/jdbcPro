@@ -1,0 +1,31 @@
+package days04.board.service;
+
+import java.util.List;
+
+import days04.board.domain.BoardDTO;
+import days04.board.persistence.BoardDAO;
+
+public class BoardService { // 사용자 요청 -> 컨트롤러 서비스 호출 -> 서비스가 DAO 호출
+
+
+	private BoardDAO dao = null;
+
+
+	//1. 생성자DI
+	public BoardService(BoardDAO dao) {
+		super();
+		this.dao = dao;
+	}
+
+	//2. setter DI
+	public void setDao(BoardDAO dao) {
+		this.dao = dao;
+	}
+
+
+	// [1] 게시글 목록 서비스
+	public List<BoardDTO> selectService(){
+		
+	}
+
+}

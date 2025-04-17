@@ -1,0 +1,50 @@
+package days04.board.service;
+
+import java.util.List;
+
+import days04.board.domain.BoardDTO;
+import days04.board.persistence.BoardDAO;
+
+// Service 클래스의 가장 중요한 역할 : 트랜잭션 처리
+public class BoardService { // 사용자 요청 -> 컨트롤러 서비스 호출 -> 서비스가 DAO 호출 
+
+
+	private BoardDAO dao = null;
+
+
+	//1. 생성자DI
+	public BoardService(BoardDAO dao) {
+		super();
+		this.dao = dao;
+	}
+
+	//2. setter DI
+	public void setDao(BoardDAO dao) {
+		this.dao = dao;
+	}
+
+	// [1] 게시글 목록 서비스
+	public List<BoardDTO> selectService(){
+		List<BoardDTO> list = null;		
+		try {
+			this.dao.get
+			// 1. 로그 기록
+			System.out.println("> 게시글 목록 : 로그 기록 작업");
+			// 2. 문자/메일 전송
+			System.out.println("> 게시글 목록 : 문자/메일 전송 작업");
+			// 3. dao.select()
+			// 커밋
+		} catch (Exception e) {
+			// 롤백
+		} finally {
+			
+		}
+		
+		
+		
+		
+		
+		return list;
+	}
+
+}

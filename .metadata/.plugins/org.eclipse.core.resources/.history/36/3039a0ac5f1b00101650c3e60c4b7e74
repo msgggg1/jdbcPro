@@ -1,0 +1,131 @@
+package days04.board.controller;
+
+import java.io.IOException;
+import java.util.Scanner;
+
+import com.util.DBConn;
+
+import days04.board.service.BoardService;
+
+public class BoardController {
+	
+	private BoardService boardService;
+	private Scanner scanner = null; // 객체 생성 시 생성
+	private int selectedNumber ;
+	// [ 페이징 처리 시 필요한 필드 선언 ]
+	
+	public BoardController() {
+		super();
+		this.scanner = new Scanner(System.in);
+	}
+
+	// 생성자 DI
+	public BoardController(BoardService boardService) {
+		this(); // 또 다른 생성자 호출 : scanner 객체 생성
+		this.boardService = boardService;
+	}
+	
+	// 게시판과 관련된 모든 기능 시작 함수
+	public void boardStart() {
+		while (true) {
+			메뉴출력();
+			메뉴선택();
+			메뉴처리();
+		} // while
+		
+	}
+
+	private void 메뉴처리() {
+		switch (this.selectedNumber) {
+	      case 1:// 새글   O
+	         새글쓰기();
+	         break;
+	      case 2:// 목록  O
+	         목록보기();
+	         break;
+	      case 3:// 보기  O
+	         상세보기();
+	         break;
+	      case 4:// 수정  O
+	         수정하기();
+	         break;
+	      case 5:// 삭제  O
+	         삭제하기();
+	         break;
+	      case 6:// 검색
+	         검색하기();
+	         break;
+	      case 7:// 종료   
+	         exit();
+	         break; 
+	      } // switch
+
+	      일시정지();
+		
+	}
+
+	private void 일시정지() {
+		System.out.println(" \t\t 계속하려면 엔터치세요.");
+	      try {
+	         System.in.read();
+	         System.in.skip(System.in.available()); // 13, 10
+	      } catch (IOException e) { 
+	         e.printStackTrace();
+	      }
+		
+	}
+
+	private void exit() {
+		DBConn.close();
+	      System.out.println("\t\t\t  프로그램 종료!!!");
+	      System.exit(-1);
+	}
+
+	private void 검색하기() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void 삭제하기() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void 수정하기() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void 상세보기() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void 목록보기() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void 새글쓰기() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void 메뉴출력() {
+	      String [] menu = {"새글","목록","보기","수정","삭제","검색","종료"};
+	      System.out.println("[ 메뉴 ]");
+	      for (int i = 0; i < menu.length; i++) {
+	         System.out.printf("%d. %s\t", i+1, menu[i]);
+	      }
+	      System.out.println();
+	   }
+
+	   private void 메뉴선택() {
+	      System.out.print("> 메뉴 선택하세요 ? ");
+	      this.selectedNumber = this.scanner.nextInt();      
+	      this.scanner.nextLine(); //   \r\n 제거
+	   }
+	
+	
+	
+} // class

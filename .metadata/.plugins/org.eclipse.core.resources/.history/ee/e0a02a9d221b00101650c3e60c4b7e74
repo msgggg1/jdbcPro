@@ -1,0 +1,108 @@
+package days04;
+
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.Scanner;
+
+import com.util.DBConn;
+
+/**
+ * @author msg
+ * @date 2025. 4. 17. -오전 9:00:42
+ * @Subject
+ * @Content Callable[Statement] = 저장프로시저 + 저장함수
+ * 				ㄴ ID 중복체크
+ * 				ㄴ 로그인 처리 = 아이디, 비밀번호
+ * 				
+ * 				로그인 페이지 이동
+ * 				아이디: []
+ * 				비밀번호 : []
+ * 				[로그인버튼][회원가입버튼]
+ */
+public class Ex01 {
+
+	public static void main(String[] args) {
+		
+		Scanner scanner = new Scanner(System.in);
+		int id = scanner.nextInt();//7369
+		String pwd = scanner.next();
+		
+		String sql = "{ call up_login(?,?,?) }";
+		
+		Connection conn = null;
+		CallableStatement cstmt = null;
+		int check = -1;
+		
+		try {
+			conn = DBConn.getConnection();
+			cstmt = conn.prepareCall(sql);
+			cstmt.execute();
+			// ? ? ?
+			cstmt.setInt(1, id);
+			cstmt.setString(2, pwd);
+			cstmt.registerOutParameter(3, Types.INTEGER);
+			check = cstmt.getInt(3);
+			cstmt.execute();
+			
+			if (check == 0) {
+				System.out.println("로그인 성공");
+			} else if(check == -1){
+				System.out.println("비밀번호가 틀립니다.");
+			} else if(check == 1){
+				System.out.println("회원가입되지 않은 아이디입니다.");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (cstmt != null) cstmt.close();
+				DBConn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+
+	} // main
+
+} // class
+
+/*
+ * 
+create or replace procedure up_login
+(
+      pid IN emp.empno%type
+    , ppwd IN emp.ename%type
+    , pcheck out number -- 0(성공) 1(ID존재,pwdX), -1(ID존재X)
+)
+IS
+    vpwd emp.ename%type;
+BEGIN
+    SELECT count(*) INTO pcheck -- 1/0
+    FROM emp
+    where empno = pid;
+    
+    IF pcheck = 1 THEN -- ID 존재
+         SELECT ename INTO vpwd -- 1/0
+         FROM emp
+         where empno = pid;
+         
+         IF ppwd = vpwd THEN pcheck := 0;
+         -- ELSE X 이미 1
+         END IF;
+    ELSE --ID 존재X
+        pcheck := -1;
+    END IF;
+--EXCEPTION
+END;
+
+DECLARE
+    vcheck number;
+BEGIN
+    up_login(7369, 'SMITH', vcheck);
+    DBMS_OUTPUT.PUT_LINE(vcheck);
+END;
+ * */
+ 

@@ -1,0 +1,30 @@
+package days04.board.test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
+
+import days04.board.service.BoardService;
+
+class BoardServiceTest {
+
+	
+	BoardService boardService ;
+	
+	
+	
+	public BoardServiceTest() {
+		super();
+		Connection conn = DBConn.getConnection();
+		BoardDAO dao = new BoardDAOImpl(conn); // DI - conn
+		this.boardService = new BoardService(dao); // DI - dao
+	}
+
+
+
+	@Test
+	void test() {
+		fail("Not yet implemented");
+	}
+
+}

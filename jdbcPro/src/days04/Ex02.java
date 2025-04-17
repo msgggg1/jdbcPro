@@ -1,0 +1,84 @@
+package days04;
+
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
+import java.util.ArrayList;
+
+import org.doit.domain.DeptVO;
+
+import com.util.DBConn;
+
+import oracle.jdbc.OracleTypes;
+
+/**
+ * @author msg
+ * @date 2025. 4. 17. -오전 9:26:58
+ * @Subject dept CRUD CallavleStatement 예제
+ * @Content
+ */
+public class Ex02 {
+
+	public static void main(String[] args) {
+		Connection conn = null;
+		ResultSet rs = null;
+		CallableStatement cstmt = null;
+
+		// 1+2
+		// CRUD
+		// ? : pdeptcursor 출력용 매개변수 
+		String sql = "{call up_selectdept(?)}";
+		// 3 작업
+		int deptno;
+		String dname, loc;
+		DeptVO vo = null;
+		try {
+			conn = DBConn.getConnection();
+			cstmt = conn.prepareCall(sql); // 미리 컴파일
+//			cstmt.registerOutParameter(1, oracle.jdbc.OracleTypes.CURSOR); // out 등록
+			cstmt.registerOutParameter(1, OracleTypes.CURSOR); // out 등록
+			
+			cstmt.executeQuery(); // 결과물 안받아옴. 출력용 매개변수 받아와서 처리
+			rs = (ResultSet) cstmt.getObject(1);
+			
+			if (rs.next()) {
+				do {
+					deptno = rs.getInt("deptno");
+					dname = rs.getString("dname");
+					loc = rs.getString("loc");               
+					vo = new DeptVO(deptno, dname, loc);
+					System.out.println(vo);
+				} while (rs.next());
+			} // if
+		} catch (SQLException e) { 
+			e.printStackTrace();
+		} finally { 
+			try {
+				if( rs != null )  rs.close();
+				if( cstmt != null ) cstmt.close();
+				DBConn.close();
+			} catch (SQLException e) { 
+				e.printStackTrace();
+			}
+		}
+
+	} // main
+
+} // class
+
+/*
+ * create or replace procedure up_selectdept
+(
+    pdeptcursor OUT SYS_REFCURSOR
+)
+IS
+begin
+    OPEN pdeptcursor FOR -- fetch, 담는거 는 자바에서 
+    select *
+    from dept;
+--exception
+end;
+ * */

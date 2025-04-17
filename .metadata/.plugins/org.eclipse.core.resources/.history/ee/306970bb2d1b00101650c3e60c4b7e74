@@ -1,0 +1,68 @@
+package days04;
+
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Scanner;
+
+import org.doit.domain.DeptVO;
+
+import com.util.DBConn;
+
+/**
+ * @author msg
+ * @date 2025. 4. 17. -오전 9:26:58
+ * @Subject
+ * @Content
+ */
+public class Ex02_04 {
+
+	public static void main(String[] args) {
+
+		// 부서 수정
+		// 수정할 부서 번호 입력 -> 부서명, 지역명만 각각 수정, 둘다 수정
+		
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("수정할 부서 번호, 부서명, 지역명 입력");
+		
+		Connection conn = null;
+		CallableStatement cstmt = null;
+
+		String sql = "{call up_updatedept( ? , ? , ? )}";
+
+		// 3 작업
+		int deptno = scanner.nextInt();
+		String dname = scanner.next();
+		String loc = scanner.next();
+
+		try {
+			conn = DBConn.getConnection();
+			cstmt = conn.prepareCall(sql); // 미리 컴파일
+
+			cstmt.setInt(1, deptno);
+			cstmt.setString(2, dname);
+			cstmt.setString(3, loc);
+
+			int rowCount = cstmt.executeUpdate(); 
+
+			if (rowCount==1) {
+				System.out.println("부서 정보 수정 성공");
+			} else {
+				System.out.println("부서 정보 수정 실패");
+			}
+
+		} catch (SQLException e) { 
+			e.printStackTrace();
+		} finally { 
+			try {
+				if( cstmt != null ) cstmt.close();
+				DBConn.close();
+			} catch (SQLException e) { 
+				e.printStackTrace();
+			}
+		}
+		
+
+	}
+
+}

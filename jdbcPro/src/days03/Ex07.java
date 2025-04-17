@@ -1,6 +1,12 @@
 package days03;
 
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Scanner;
+
+import com.util.DBConn;
 
 /**
  * @author msg
@@ -20,6 +26,46 @@ public class Ex07 {
 		
 		// 저장 프로시저 생성 up_login -> 0 1 -1
 		
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("아이디를 입력하세요");
+		int id = scanner.nextInt();
+		System.out.println("비밀번호를 입력하세요");
+		String pw = scanner.next();
+		
+		String sql = "{call up_login(?,?,?)}";
+		Connection conn = null;
+		CallableStatement cstmt = null;
+		
+		try {
+			conn = DBConn.getConnection();
+			cstmt = conn.prepareCall(sql);
+			
+			cstmt.setInt(1, id);
+			cstmt.setString(2, pw);
+			cstmt.registerOutParameter(3, Types.INTEGER);
+			cstmt.execute();
+			
+			int check = cstmt.getInt(3);
+			
+			if (check == 1) {
+				System.out.println("로그인 성공");
+			} else if(check == 0){
+				System.out.println("비밀번호가 틀립니다.");
+			} else {
+				System.out.println("회원가입되지 않은 아이디입니다.");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if (cstmt != null) {
+				try {
+					cstmt.close();
+					DBConn.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			} // if
+		}
 		
 	}
 
