@@ -1,0 +1,126 @@
+package days04.board.persistence;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import days04.board.domain.BoardDTO;
+
+public class BoardDAOImpl implements BoardDAO {
+
+	private Connection conn = null; // setter 통해 주입받음
+	private PreparedStatement pstmt = null;
+	private ResultSet rs = null;
+	private BoardDTO dto = null;
+	
+	// 생성자 DI, setter DI - 외부에서 만들어서 공통적으로 받아옴
+	// 외부에서 객체 만들어질때 주입
+	public BoardDAOImpl(Connection conn) {
+		super();
+		this.conn = conn;
+	}
+	
+	//setter DI
+	public void setConn(Connection conn) {
+		this.conn = conn;
+	}
+	
+	
+	public Connection getConn() {
+		return conn;
+	}
+
+	
+	@Override
+	public List<BoardDTO> select() throws SQLException {
+		List<BoardDTO> list = null; //DB 연동해서 채워넣음
+		String sql ="select seq, title, writer, email, writedate, readed "
+					+ " from tbl_cstVSBoard "
+					+ " order by seq DESC";
+		long seq;
+		String writer, email, title;   
+		Date writedate; 
+		int readed;
+		
+		this.pstmt = conn.prepareStatement(sql); // 오류 처리 X d/t throws (여기서 처리 안함)
+		this.rs = this.pstmt.executeQuery();
+		
+		if (this.rs.next()) {
+			list = new ArrayList<BoardDTO>();
+			
+			do {
+				seq = this.rs.getInt("seq");
+				title = this.rs.getString("title");
+				writer = this.rs.getString("writer");
+				email = this.rs.getString("email");
+				writedate = this.rs.getDate("writedate");
+				readed = this.rs.getInt("readed");
+				
+				this.dto = new BoardDTO().builder()
+										.seq(seq)
+										.title(title)
+										.writer(writer)
+										.email(email)
+										.writedate(writedate)
+										.readed(readed)
+										.build();
+				
+				list.add(dto);
+				
+			} while (this.rs.next());
+		} // if
+		
+		if (this.rs != null) this.rs.close();
+		if (this.pstmt != null)this.pstmt.close();
+		// DB는 닫지 않음
+		
+		return list; // 레코드 없다면 null
+	}
+
+	@Override
+	public int insert(BoardDTO dto) throws SQLException {
+		// 실제 DB insert 작업
+		String sql = "INSERT INTO tbl_cstvsboard "
+	            + " (seq, writer, pwd, email, title, tag, content ) "
+	            + "VALUES "
+	            + " (seq_tblcstvsboard.NEXTVAL, ?, ?, ?, ?, ?, ? ) ";
+	      int rowCount = 0;
+	      this.pstmt = this.conn.prepareStatement(sql);
+	      // writer, pwd, email, title, tag, content
+	      this.pstmt.setString(1, dto.getWriter());
+	      this.pstmt.setString(2, dto.getPwd());
+	      this.pstmt.setString(3, dto.getEmail());
+	      this.pstmt.setString(4, dto.getTitle());
+	      this.pstmt.setInt(5, dto.getTag());
+	      this.pstmt.setString(6, dto.getContent());
+	      
+	      rowCount = this.pstmt.executeUpdate();      
+	      return rowCount;
+	}
+
+	@Override
+	public int increaseReaded(long seq) throws SQLException {
+		
+		String sql = "UPDATE tbl_cstvsboard "
+					+ " SET readed = readed + 1 "
+					+ " WHERE seq = ? ";
+		
+		this.pstmt = this.conn.prepareStatement(sql);
+		this.pstmt.setLong(1, seq);
+		int rowCount = this.pstmt.executeUpdate();
+		if (this.pstmt != null)this.pstmt.close();
+		return rowCount;
+	}
+
+	@Override
+	public BoardDTO view(long seq) throws SQLException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+
+} // class

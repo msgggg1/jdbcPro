@@ -1,0 +1,20 @@
+package days05;
+
+public class Ex03 {
+
+	public static void main(String[] args) {
+		// 페이징 블럭
+		// [1] 2 3 4 5 6 7 8 9 10 NEXT
+		int currentPage = 1; //현재 페이지 번호
+		int numberPerPage = 10; // 한 페이지당 게시글 수
+		int numberOfPageBlock = 10; // 페이지 블럭 수
+		
+		// 총 페이지 수 = 151 / 10 = 15.1 = 16페이지
+		int totalRecord = 151;
+		int totalPages = (int)Math.ceil((double)totalRecord/numberPerPage);
+		System.out.println(totalPages);
+		
+
+	}
+
+}

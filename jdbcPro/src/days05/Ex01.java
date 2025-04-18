@@ -1,0 +1,42 @@
+package days05;
+
+import days04.board.controller.BoardController;
+
+/**
+ * @author msg
+ * @date 2025. 4. 18. -오전 9:01:40
+ * @Subject
+ * @Content
+ */
+public class Ex01 {
+
+	public static void main(String[] args) {
+		// [문제] 
+//		프로그램 실행 시작 부터
+//		게시판의 글쓰기 작업의 처리 과정을 구체적으로 적으세요. 
+//		BoardController.boardstart(); 실행한다.
+//		-> 메뉴에서 새글쓰기(); 실행
+//		-> 입력받은 데이터를 DTO 객체로 boardService.insertService()에 전달
+//		-> boardService가 boardDAO에 DTO객체를 다시 전달
+//		-> boardDAO가 실제로 DB에 insert 작업 수행하고 updateExecute()의 결과물인 rowCount return
+//		-> BoardService에 rowcount return -> BoardController에 rowCount return
+//		-> "새글쓰기 성공 여부 출력" -> 목록보기(); 수행
+		
+		
+		// 1) 페이징 처리 X 글 목록
+		// 2) 글쓰기
+		// 3) 글 상세보기
+		// 	(1) 글 목록
+		//	(2) 상세보기할 글 번호 입력 
+		//	(3) BoardDTO BoardService.???메서드(글번호) 호출
+		//	(4) BoardDTO BoardDAO.???메서드(글번호)
+		// 4) 글 삭제
+		// 5) 글 수정
+		// 6) 페이징 처리 X 글 검색
+		
+		// 1) 페이징 처리 O - 글 목록
+		// 2) 페이징 처리 O - 글 검색
+		
+	} // main
+
+} // class

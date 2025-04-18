@@ -40,5 +40,21 @@ class BoardDAOImplTest {
 		}
 		System.out.println("end");
 	}
+	
+	@Test
+	void testBoardDAOSearch() {
+//		fail("Not yet implemented");
+		List<BoardDTO> list = null;
+		try {
+			list = this.dao.search("w", "태정");
+//			list.forEach(dto -> System.out.println(dto));
+			list.forEach(System.out::println);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			DBConn.close();
+		}
+		System.out.println("end");
+	}
 
 }

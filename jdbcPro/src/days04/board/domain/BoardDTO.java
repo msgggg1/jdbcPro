@@ -23,7 +23,6 @@ public class BoardDTO { // BoardVO 상관없음
 	private int readed;
 	private int tag;
 	private String content;
-
 	
 	
 } // class

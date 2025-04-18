@@ -295,14 +295,30 @@ commit;
              COMMIT;
           END;
           
+-- 
+select seq, title, writer, email, writedate, readed
+from tbl_cstVSBoard
+order by seq DESC;
           
           
-          
-          
-          
-          
-          
-          
+-- 현재 페이지 : 1  / 한페이지당 출력할 게시글 수 : 10
+SELECT *
+from tbl_cstVSBoard
+Order by seq desc;
+  ---- TOP - N
+SELECT *
+FROM (
+    SELECT rownum no, t.*
+    FROM (
+        SELECT *
+        from tbl_cstVSBoard
+        Order by seq desc      
+        )t
+)b
+where no between 1 AND 10 ;
+
+select count(*)
+from tbl_cstVSBoard;
           
           
           

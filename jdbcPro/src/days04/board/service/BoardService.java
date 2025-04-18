@@ -56,14 +56,14 @@ public class BoardService { // 사용자 요청 -> 컨트롤러 서비스 호출
 				e.printStackTrace();
 			} 
 		}
-		
+
 		return list;
 	}
 
 	public int insertService(BoardDTO dto) {
 		int rowCount = 0;
 		try {
-			
+
 			((BoardDAOImpl)this.dao).getConn().setAutoCommit(false); // 오토커밋 막음
 			// 1. 로그 기록
 			System.out.println("> 게시글 목록 : 로그 기록 작업");
@@ -89,4 +89,190 @@ public class BoardService { // 사용자 요청 -> 컨트롤러 서비스 호출
 		return rowCount;
 	}
 
-}
+	// [3] 게시글 상세보기 서비스 = 조회수 증가 + 게시글 보기
+	public BoardDTO viewService(long seq){
+		BoardDTO dto = null;		
+		try {
+			((BoardDAOImpl)this.dao).getConn().setAutoCommit(false); // 오토커밋 막음
+			// 1. 로그 기록
+			System.out.println("> 게시글 상세보기 : 로그 기록 작업");
+
+			// 3-1. 조회수 증가dao.select()
+			int rowCount = this.dao.increaseReaded(seq);
+			// 3-2. 상세보기
+			dto = this.dao.view(seq);
+			// 커밋
+			((BoardDAOImpl)this.dao).getConn().commit();
+		} catch (Exception e) {
+			// 롤백
+			try {
+				((BoardDAOImpl)this.dao).getConn().rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		} finally {
+			try {
+				((BoardDAOImpl)this.dao).getConn().setAutoCommit(true); // 다시 오토커밋
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} 
+		}
+
+		return dto;
+	}
+
+
+	// [4] 게시글 삭제 서비스
+	public int deleteService(long seq) {
+		int rowCount = 0;
+		
+		try {
+			((BoardDAOImpl)this.dao).getConn().setAutoCommit(false); // 오토커밋 막음
+			// 1. 로그 기록
+			System.out.println("> 게시글 삭제 : 로그 기록 작업");
+
+			// 3. 삭제
+			rowCount = this.dao.delete(seq);
+			// 커밋
+			((BoardDAOImpl)this.dao).getConn().commit();
+		} catch (Exception e) {
+			// 롤백
+			try {
+				((BoardDAOImpl)this.dao).getConn().rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		} finally {
+			try {
+				((BoardDAOImpl)this.dao).getConn().setAutoCommit(true); // 다시 오토커밋
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} 
+		}
+		return rowCount;
+	}
+
+	public int updateService(BoardDTO dto) {
+		int rowCount = 0;
+		try {
+			((BoardDAOImpl)this.dao).getConn().setAutoCommit(false); // 오토커밋 막음
+			// 1. 로그 기록
+			System.out.println("> 게시글 수정 : 로그 기록 작업");
+
+			// 3. 삭제
+			rowCount = this.dao.update(dto);
+			// 커밋
+			((BoardDAOImpl)this.dao).getConn().commit();
+		} catch (Exception e) {
+			// 롤백
+			try {
+				((BoardDAOImpl)this.dao).getConn().rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		} finally {
+			try {
+				((BoardDAOImpl)this.dao).getConn().setAutoCommit(true); // 다시 오토커밋
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} 
+		}
+		
+		return rowCount;
+	}
+	
+	//[6] 게시글 검색 서비스
+	public List<BoardDTO> searchService(String condition, String keyword){
+		List<BoardDTO> list = null;		
+		try {
+			((BoardDAOImpl)this.dao).getConn().setAutoCommit(false); // 오토커밋 막음
+			// 1. 로그 기록
+			System.out.println("> 게시글 검색 : 로그 기록 작업");
+			// 3. dao.search()
+			list = this.dao.search(condition, keyword); // 
+			// 커밋
+			((BoardDAOImpl)this.dao).getConn().commit();
+		} catch (Exception e) {
+			// 롤백
+			try {
+				((BoardDAOImpl)this.dao).getConn().rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		} finally {
+			try {
+				((BoardDAOImpl)this.dao).getConn().setAutoCommit(true); // 다시 오토커밋
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} 
+		}
+
+		return list;
+	}
+
+	public List<BoardDTO> selectService(int currentPage, int numberPerPage) {
+		List<BoardDTO> list = null;		
+		try {
+			
+			((BoardDAOImpl)this.dao).getConn().setAutoCommit(false); // 오토커밋 막음
+			// 1. 로그 기록
+			System.out.println("> 게시글 목록 : 로그 기록 작업");
+			// 2. 문자/메일 전송
+			System.out.println("> 게시글 목록 : 문자/메일 전송 작업");
+			// 3. dao.select()
+			list = this.dao.select(currentPage, numberPerPage);
+			
+			// 커밋
+			((BoardDAOImpl)this.dao).getConn().commit();
+		} catch (Exception e) {
+			// 롤백
+			try {
+				((BoardDAOImpl)this.dao).getConn().rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		} finally {
+			try {
+				((BoardDAOImpl)this.dao).getConn().setAutoCommit(true); // 다시 오토커밋
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} 
+		}
+
+		return list;
+	}
+
+	// 오버로딩
+	// 검색기능 + 페이징 처리 O
+	public List<BoardDTO> searchService(String condition, String keyword, int currentPage, int numberPerPage) {
+		List<BoardDTO> list = null;		
+		try {
+			((BoardDAOImpl)this.dao).getConn().setAutoCommit(false); // 오토커밋 막음
+			// 1. 로그 기록
+			System.out.println("> 게시글 검색 : 로그 기록 작업");
+			// 3. dao.search()
+			list = this.dao.search(condition, keyword, currentPage, numberPerPage); // 
+			// 커밋
+			((BoardDAOImpl)this.dao).getConn().commit();
+		} catch (Exception e) {
+			// 롤백
+			try {
+				((BoardDAOImpl)this.dao).getConn().rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		} finally {
+			try {
+				((BoardDAOImpl)this.dao).getConn().setAutoCommit(true); // 다시 오토커밋
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} 
+		}
+
+		return list;
+	}
+
+
+} // class
+
+

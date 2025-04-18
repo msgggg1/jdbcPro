@@ -1,0 +1,126 @@
+package days04.board.service;
+
+import java.sql.SQLException;
+import java.util.List;
+
+import days04.board.domain.BoardDTO;
+import days04.board.persistence.BoardDAO;
+import days04.board.persistence.BoardDAOImpl;
+
+// Service 클래스의 가장 중요한 역할 : 트랜잭션 처리
+public class BoardService { // 사용자 요청 -> 컨트롤러 서비스 호출 -> 서비스가 DAO 호출 
+
+
+	private BoardDAO dao = null; // impl x 유지보수, 확장성은 인터페이스가 더 좋음
+
+
+	//1. 생성자DI
+	public BoardService(BoardDAO dao) {
+		super();
+		this.dao = dao;
+	}
+
+	//2. setter DI
+	public void setDao(BoardDAO dao) {
+		this.dao = dao;
+	}
+
+	// [1] 게시글 목록 서비스
+	public List<BoardDTO> selectService(){
+		List<BoardDTO> list = null;		
+		try {
+			// emplotee getPat(){} x
+			// 물려받는 regular getPay(){} 구현
+			// employee emp = new REgular();
+			// emp. -> getPay 안보임
+			((BoardDAOImpl)this.dao).getConn().setAutoCommit(false); // 오토커밋 막음
+			// 1. 로그 기록
+			System.out.println("> 게시글 목록 : 로그 기록 작업");
+			// 2. 문자/메일 전송
+			System.out.println("> 게시글 목록 : 문자/메일 전송 작업");
+			// 3. dao.select()
+			list = this.dao.select(); // 
+			// 커밋
+			((BoardDAOImpl)this.dao).getConn().commit();
+		} catch (Exception e) {
+			// 롤백
+			try {
+				((BoardDAOImpl)this.dao).getConn().rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		} finally {
+			try {
+				((BoardDAOImpl)this.dao).getConn().setAutoCommit(true); // 다시 오토커밋
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} 
+		}
+		
+		return list;
+	}
+
+	public int insertService(BoardDTO dto) {
+		int rowCount = 0;
+		try {
+			
+			((BoardDAOImpl)this.dao).getConn().setAutoCommit(false); // 오토커밋 막음
+			// 1. 로그 기록
+			System.out.println("> 게시글 목록 : 로그 기록 작업");
+
+			// 3. dao.select()
+			rowCount = this.dao.insert(dto); // 
+			// 커밋
+			((BoardDAOImpl)this.dao).getConn().commit();
+		} catch (Exception e) {
+			// 롤백
+			try {
+				((BoardDAOImpl)this.dao).getConn().rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		} finally {
+			try {
+				((BoardDAOImpl)this.dao).getConn().setAutoCommit(true); // 다시 오토커밋
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} 
+		}
+		return rowCount;
+	}
+
+	// [3] 게시글 상세보기 서비스 = 조회수 증가 + 게시글 보기
+	public BoardDTO viewService(long seq){
+		BoardDTO dto = null;		
+		try {
+			((BoardDAOImpl)this.dao).getConn().setAutoCommit(false); // 오토커밋 막음
+			// 1. 로그 기록
+			System.out.println("> 게시글 상세보기 : 로그 기록 작업");
+
+			// 3-1. 조회수 증가dao.select()
+			int rowCount = this.dao.increaseReaded(seq);
+			// 3-2. 상세보기
+			dto = this.dao.view(seq);
+			// 커밋
+			((BoardDAOImpl)this.dao).getConn().commit();
+		} catch (Exception e) {
+			// 롤백
+			try {
+				((BoardDAOImpl)this.dao).getConn().rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		} finally {
+			try {
+				((BoardDAOImpl)this.dao).getConn().setAutoCommit(true); // 다시 오토커밋
+			} catch (SQLException e) {
+				e.printStackTrace();
+			} 
+		}
+		
+		return dto;
+	}
+	
+} // class
+
+

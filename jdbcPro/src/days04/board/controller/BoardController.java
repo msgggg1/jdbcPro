@@ -9,6 +9,7 @@ import java.util.Scanner;
 import com.util.DBConn;
 
 import days04.board.domain.BoardDTO;
+import days04.board.domain.PagingVO;
 import days04.board.service.BoardService;
 
 public class BoardController {
@@ -98,25 +99,204 @@ public class BoardController {
 	}
 
 	private void 검색하기() {
-		// TODO Auto-generated method stub
+		System.out.println("> 검색 기준 : 제목(t), 내용(c), 작성자(w), 제목+내용(tc) 입력 ");
+		String condition = this.scanner.nextLine();
+		System.out.println("> 검색어 입력");
+		String keyword = this.scanner.nextLine();
+		
+		System.out.println("> 현재 페이지 번호를 입력");
+		int currentPage = this.scanner.nextInt();
+		
+//		List<BoardDTO> list = this.boardService.searchService(condition, keyword); // dao, dao.select() -> Oracle DB 연동해서 처리 -> LIist<DTO>
+		List<BoardDTO> list = this.boardService.searchService(condition, keyword, currentPage, numberPerPage); // dao, dao.select() -> Oracle DB 연동해서 처리 -> LIist<DTO>
+
+		if(list == null) {
+			System.out.println("\t\t > 게시글 존재 X");
+		} else {
+			list.forEach(dto -> {
+				System.out.printf("%d\t%-30s          %s\t%10s\t%d\n"
+											,dto.getSeq()
+											,dto.getTitle()
+											,dto.getWriter()
+											,dto.getWritedate()
+											,dto.getReaded()
+						);
+				
+			});
+		}
+		
+		System.out.println("----------------------------------------------------------------------------------------------------------");
+		PagingVO pagingVO = new PagingVO(currentPage, numberPerPage, numberOfPageBlock, condition, keyword);
+		
+		System.out.println("\t\t");
+		if (pagingVO.isPrev()) System.out.print("PREV");
+		for (int i = pagingVO.getStart(); i <= pagingVO.getEnd(); i++) {
+			System.out.printf(i != currentPage ? " %d " : " [%d] ",i);
+		} // for
+		if (pagingVO.isNext()) System.out.print("NEXT");
+		System.out.println();
+		System.out.println("----------------------------------------------------------------------------------------------------------");
+		
 		
 	}
 
 	private void 삭제하기() {
-		// TODO Auto-generated method stub
+		System.out.println("> 삭제할 게시물 번호 입력?");
+		long seq = this.scanner.nextLong();
+		
+		int rowCount = this.boardService.deleteService(seq);
+		
+		
+		if (rowCount == 1) {
+			System.out.println("> 게시글 삭제 성공.");
+			목록보기();
+		} else {
+			System.out.println(" 게시글 삭제 실패. ");
+		}
 		
 	}
 
 	private void 수정하기() {
-		// TODO Auto-generated method stub
+		// 글 상세보기 -> [수정] 버튼 클릭 -> 수정 페이지로 이동
+		System.out.println("> 수정하고자 하는 게시글 번호 입력");
+		long seq = this.scanner.nextLong();
+		scanner.nextLine(); // \r\n 제거용도
 		
+		// 상세보기 복사 시작 + 필요없는 조회수 증가/ 매개변수 추가해서 분기
+		BoardDTO dto = this.boardService.viewService(seq);
+		
+		if (dto == null) {
+			System.out.println("> 게시글이 존재하지 않습니다.");
+			return;
+		} // if
+		
+		// M[V]C : 출력담당 객체 (jsp 페이지)
+		System.out.println("\tㄱ. 글번호 : "+ seq);
+		System.out.println("\tㄴ. 작성자 : "+ dto.getWriter());
+		System.out.println("\tㄷ. 조회수 : "+ dto.getReaded());
+		System.out.println("\tㄹ. 글제목 : "+ dto.getTitle());
+		System.out.println("\tㅁ. 글내용 : "+ dto.getContent());
+		System.out.println("\tㅂ. 작성일 : "+ dto.getWritedate());
+		
+		// 인증받은 작성자 == 글쓴이라면 수정/삭제 가능
+		if ("권태정".equals(dto.getWriter())) {
+			System.out.println("\t\n [수정] [삭제]");
+		} // if
+		System.out.println("\t\n [답글] [목록(home)]");
+		
+		// 상세보기 복사 끝
+		
+		// 수정 값 입력
+		System.out.println("> 1. 이메일 입력");
+		String email = scanner.nextLine();
+		System.out.println("> 2. 제목 입력");
+		String title = scanner.nextLine();
+		System.out.println("> 3. 내용 입력");
+		String content = scanner.nextLine();
+		
+		if (email.trim().equals("")) email = dto.getEmail();
+		if (title.trim().equals("")) title = dto.getTitle();
+		if (content.trim().equals("")) content = dto.getContent();
+	
+		dto = BoardDTO.builder()
+						.seq(seq)
+						.email(email)
+						.title(title)
+						.content(content)
+						.build();
+		
+		int rowCount = this.boardService.updateService(dto);
+		
+		if (rowCount == 1) {
+			System.out.println("> 게시글 수정 성공");
+			상세보기();
+		} // if
+				
 	}
 
 	private void 상세보기() {
-		// TODO Auto-generated method stub
+		System.out.println("> 볼 게시물 번호 입력?");
+		long seq = this.scanner.nextLong();
+		
+		BoardDTO dto = this.boardService.viewService(seq);
+		
+		if (dto == null) {
+			System.out.println("> 게시글이 존재하지 않습니다.");
+			return;
+		} // if
+		
+		// M[V]C : 출력담당 객체 (jsp 페이지)
+		System.out.println("\tㄱ. 글번호 : "+ seq);
+		System.out.println("\tㄴ. 작성자 : "+ dto.getWriter());
+		System.out.println("\tㄷ. 조회수 : "+ dto.getReaded());
+		System.out.println("\tㄹ. 글제목 : "+ dto.getTitle());
+		System.out.println("\tㅁ. 글내용 : "+ dto.getContent());
+		System.out.println("\tㅂ. 작성일 : "+ dto.getWritedate());
+		
+		// 인증받은 작성자 == 글쓴이라면 수정/삭제 가능
+		if ("권태정".equals(dto.getWriter())) {
+			System.out.println("\t\n [수정] [삭제]");
+		} // if
+		System.out.println("\t\n [답글] [목록(home)]");
+		
 		
 	}
+	
+	// 클래스의 필드 선언
+	private int currentPage = 1; 
+	private int numberPerPage = 10;
+	int numberOfPageBlock = 10; // 페이지 블럭 수
+	
+	// [페이징 처리 O]
+	private void 목록보기() {
+		System.out.println("> 현재 페이지번호를 입력? ");
+		this.currentPage = this.scanner.nextInt();
+		
+		List<BoardDTO> list = this.boardService.selectService(currentPage, numberPerPage); 
+		
+		// M[View]C
+		// 출력 담당자[M]에게 원래 넘겨야 함. 원래 컨트롤러 기능 아님
+		System.out.println("\t\t\t 게시판");
+		System.out.println("----------------------------------------------------------------------------------------------------------");
+		System.out.printf("%s\t%-40s%s\t%-10s\t%s\n", "글번호", "글제목", "작성자" , "작성날짜" ,"조회수" );
 
+		System.out.println("----------------------------------------------------------------------------------------------------------");
+		
+		if(list == null) {
+			System.out.println("\t\t > 게시글 존재 X");
+		} else {
+			
+			
+			// 위의 코딩 람다식으로 수정
+			list.forEach(dto -> {
+				System.out.printf("%d\t%-30s          %s\t%10s\t%d\n"
+											,dto.getSeq()
+											,dto.getTitle()
+											,dto.getWriter()
+											,dto.getWritedate()
+											,dto.getReaded()
+						);
+				
+			});
+		}
+		
+		System.out.println("----------------------------------------------------------------------------------------------------------");
+//		 System.out.println("\t\t PREV  [1] 2 3 4 5 6 7 8 9 10  NEXT");
+		// 						 boolea start				end  boolean         ----> PagingVO (값 전달 x, 값 가지는 객체)
+		PagingVO pagingVO = new PagingVO(currentPage, numberPerPage, numberOfPageBlock);
+		System.out.println("\t\t");
+		if (pagingVO.isPrev()) System.out.print("PREV");
+		for (int i = pagingVO.getStart(); i <=pagingVO.getEnd(); i++) {
+			System.out.printf(i != currentPage ? " %d " : " [%d] ",i);
+		} // for
+		if (pagingVO.isNext()) System.out.print("NEXT");
+		System.out.println();
+		System.out.println("----------------------------------------------------------------------------------------------------------");
+		
+	}
+	
+	
+	/* [페이징 처리X]
 	private void 목록보기() {
 		System.out.println("> 현재 페이지번호를 입력? ");
 		List<BoardDTO> list = this.boardService.selectService(); // dao, dao.select() -> Oracle DB 연동해서 처리 -> LIist<DTO>
@@ -141,7 +321,7 @@ public class BoardController {
 
 				
 			} // while
-			*/
+			별/
 			
 			// 위의 코딩 람다심으로 수정
 			list.forEach(dto -> {
@@ -161,6 +341,7 @@ public class BoardController {
 		System.out.println("----------------------------------------------------------------------------------------------------------");
 		
 	}
+	*/
 
 	private void 새글쓰기() {
 		//					  홍길동,1234,hong@naver.com,제목.....,0,내용 엔터

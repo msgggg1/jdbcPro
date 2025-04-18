@@ -1,0 +1,24 @@
+package days05;
+
+public class Ex02 {
+
+	public static void main(String[] args) {
+		/*
+		 * where no between ? AND ?;
+		 * 				  start  end
+		 * */
+		
+		// 현재페이지번호 저장 변수
+		int currentPage = 1;
+		// 한 페이지에 출력할 게시글 수 
+		int numberPerPage = 10;
+		
+		// 총 레코드 수
+		int totalRecord = 150;
+		// 총 페이지 수 
+		int totalPages = (int)Math.ceil((double)totalRecord / numberPerPage);
+		System.out.println(totalPages);
+
+	} // main
+
+} // class

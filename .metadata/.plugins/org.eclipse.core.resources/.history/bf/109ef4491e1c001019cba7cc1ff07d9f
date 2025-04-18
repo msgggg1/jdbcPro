@@ -1,0 +1,44 @@
+package days05;
+
+public class Ex03 {
+
+	public static void main(String[] args) {
+		// 페이징 블럭
+		// [1] 2 3 4 5 6 7 8 9 10 NEXT
+		int currentPage = 1; //현재 페이지 번호
+		int numberPerPage = 10; // 한 페이지당 게시글 수
+		int numberOfPageBlock = 10; // 페이지 블럭 수
+		
+		// 총 페이지 수 = 151 / 10 = 15.1 = 16페이지
+		int totalRecord = 151;
+		int totalPages = (int)Math.ceil((double)totalRecord/numberPerPage);
+//		System.out.println(totalPages);
+		
+		for (int i = currentPage; i < totalPages; i++) {
+			System.out.printf("currentPage = %d\t", i);
+			System.out.println();
+		} // for
+		
+//      start               end
+// currentPage = 1      [1] 2 3 4 5 6 7 8 9 10 >
+// currentPage = 2      1 [2] 3 4 5 6 7 8 9 10 >
+// currentPage = 3      1 2 [3] 4 5 6 7 8 9 10 >
+// currentPage = 4      [1] 2 3 4 5 6 7 8 9 10 >
+// currentPage = 5      [1] 2 3 4 5 6 7 8 9 10 >
+// currentPage = 6      [1] 2 3 4 5 6 7 8 9 10 >
+// currentPage = 7      [1] 2 3 4 5 6 7 8 9 10 >
+// currentPage = 8      [1] 2 3 4 5 6 7 8 9 10 >
+// currentPage = 9      [1] 2 3 4 5 6 7 8 9 10 >
+// currentPage = 10     1 2 3 4 5 6 7 8 9 [10] >
+
+// currentPage = 11   < [11] 12 3 4 5 16 
+// currentPage = 12   < [11] 12 3 4 5 16 
+// currentPage = 13   < [11] 12 3 4 5 16 
+// currentPage = 14   < [11] 12 3 4 5 16 
+// currentPage = 15   < [11] 12 3 4 5 16 
+// currentPage = 16   < 11 12 3 4 5 [16]    
+		
+
+	}
+
+}
