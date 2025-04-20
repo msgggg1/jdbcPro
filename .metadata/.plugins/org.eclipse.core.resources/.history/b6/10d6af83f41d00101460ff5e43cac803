@@ -30,7 +30,7 @@ public class PagingVO {
 			if ( end > totalPages) end = totalPages;
 			
 			if (start  != 1) this.prev = true ;
-			if (end  != totalPages) this.next = true ;
+			if (end  != totalPages) this.prev = true ;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -43,17 +43,17 @@ public class PagingVO {
 		
 		int totalPages;
 		try {
-			totalPages = dao.getTotalPages( numberPerPage , condition, keyword );
+			totalPages = dao.getTotalPages(numberPerPage , condition, keyword );
 			this.start = (currentPage-1)/numberOfPageBlock * numberOfPageBlock +1 ;
 			this.end = start + numberOfPageBlock -1;
 			if ( end > totalPages) end = totalPages;
 			
 			if (start  != 1) this.prev = true ;
-			if (end  != totalPages) this.next = true ;
+			if (end  != totalPages) this.prev = true ;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
 	
-} // class
+}
