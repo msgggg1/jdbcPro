@@ -1,0 +1,13 @@
+package temp;
+
+import java.util.Arrays;
+
+public class temp1 {
+
+	public static void main(String[] args) {
+		
+
+	} // main
+
+} // class
+
